@@ -62,3 +62,11 @@ Do not copy Browserbase text or brand identity.
 ## Repository continuity
 
 The selected folder is now the local Git checkout on branch `main`, with `origin` set to `https://github.com/kanikap1981/bitelog.git`. The remote was verified to be empty before initialization, so there were no remote changes to pull or conflicts to resolve. The initial local commit contains the current project and handoff. It has not been pushed because project-level push authorization has not yet been given.
+
+## September 20, 2026 — save-sheet dismissal fix
+
+- Device testing found that meal and Settings values persisted, but their modal sheets did not dismiss after Save. Daily calories increasing confirmed persistence and rendering were already working.
+- Both flows had the same cause: direct reliance on `HTMLDialogElement.close()` inside WKWebView.
+- All dialogs now use shared `openDialog` / `closeDialog` helpers. Closing still calls the native API, then explicitly removes the `open` state and forces immediate visual dismissal as a WebKit fallback.
+- The UI regression test now proves meal persistence, Settings persistence, render-before-close ordering, and dismissal even when the simulated native `close()` is a no-op.
+- The fixed bundle built, installed, and launched on Kanika's physical iPhone. Final on-device interaction confirmation is still pending.

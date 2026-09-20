@@ -18,6 +18,8 @@ Preserved the existing POST `/v1/meals/analyze-inline` request `{image_data_url}
 
 Fixed duplicated endpoint paths after legacy configuration migration; added URL/response validation, photo decode errors, 60-second client deadline, server timeout/network/provider errors, stale-response cancellation, clear retry/manual-entry messaging, request IDs, and a Settings health check. Preserved fractional protein. Added backend and UI regression tests. Recorded the required multi-device workflow in AGENTS.md and product decisions in repository documents.
 
+After physical-device feedback, fixed a shared WKWebView dialog issue: meal and Settings values persisted, but their sheets stayed open after Save. Direct `dialog.close()` calls were replaced with shared helpers that explicitly remove the dialog's `open` state and force immediate dismissal. The fixed bundle built, installed, and launched on Kanika's iPhone.
+
 ## Changed files
 
 - `AGENTS.md` — multi-device workflow and product context.
@@ -41,6 +43,8 @@ Live provider smoke test through the actual FastAPI route returned HTTP 200 with
 The updated checkout built, installed, and launched successfully through Xcode on `Kanika's iPhone`; Xcode reported `Running BiteLog on Kanika's iPhone`. The backend was started from this checkout with the existing sibling Python 3.9 environment and server `.env`, and both `http://127.0.0.1:8000/health` and `http://10.0.0.214:8000/health` returned HTTP 200. The iPhone initially had to be unlocked before Xcode could launch the app.
 
 The physical in-app LAN request, full WKWebView photo flow, and real-meal estimation remain unverified because the iPhone screen is not remotely controllable from this Mac. Full Xcode is installed at `/Users/kanika/Downloads/Xcode.app`, while shell `xcrun` still resolves to Command Line Tools unless `DEVELOPER_DIR` is set. Apple Health remains unvalidated and unchanged. Local HTTP, broad CORS, lack of API authentication/rate limits, and production-only API configuration are existing separate hardening tasks. The remote contained no prior Git history to audit.
+
+The latest UI regression test passes with native dialog closing deliberately simulated as a no-op. It verifies that Save meal persists the complete meal, renders the Today view, and dismisses the sheet; Save Settings persists targets/API URL, renders, and dismisses its sheet. The replacement build is on the physical device, but a final tap-through confirmation is pending.
 
 ## Exact run commands
 
@@ -90,4 +94,4 @@ ipconfig getifaddr en0
 
 ## Next recommended task
 
-On the running physical iPhone, open BiteLog Settings, set the API URL to `http://10.0.0.214:8000`, tap **Check API connection**, save, and estimate a real meal photo while watching the backend request log. Record the result here. After that, move to native HealthKit authorization/steps/activity validation. Push the local commits only after explicit authorization.
+On the running physical iPhone, confirm Save closes Settings. Then estimate or manually enter a meal, tap Save meal, and confirm the sheet closes and the meal card appears on Today. If that passes, validate a real meal photo while watching the backend request log and record the result here. After that, move to native HealthKit authorization/steps/activity validation. Push the local commits only after explicit authorization.

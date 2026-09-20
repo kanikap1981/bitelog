@@ -59,8 +59,24 @@ const $=s=>document.querySelector(s);const today=()=>new Date().toISOString().sl
 let state=JSON.parse(localStorage.getItem('bitelog')||'null')||{targetCalories:2000,targetProtein:120,days:{},voiceNotes:[],program:{},apiBaseURL:''};state.voiceNotes=state.voiceNotes||[];state.program=state.program||{};state.apiBaseURL=normalizeAPIURL(state.apiBaseURL||state.analysisEndpoint||'');let photoData='';let photoVersion=0;let analysisController=null;let mediaRecorder=null;let voiceChunks=[];
 function day(key=today()){return state.days[key]||(state.days[key]=[])}function persist(){localStorage.setItem('bitelog',JSON.stringify(state))}
 function render(){const meals=day();const cal=meals.reduce((a,m)=>a+(+m.calories||0),0),pro=meals.reduce((a,m)=>a+(+m.protein||0),0);$('#remaining').textContent=Math.max(0,state.targetCalories-cal);$('#calText').textContent=`${cal} / ${state.targetCalories}`;$('#proteinText').textContent=`${Math.round(pro)} / ${state.targetProtein}g`;const cp=Math.min(100,cal/state.targetCalories*100||0),pp=Math.min(100,pro/state.targetProtein*100||0);$('#ring').style.setProperty('--pct',cp+'%');$('#calBar').style.width=cp+'%';$('#proteinBar').style.width=pp+'%';const root=$('#meals');root.innerHTML='';if(!meals.length){root.innerHTML='<div class="card empty">No meals yet. Add your first meal when you eat.</div>'}else meals.slice().reverse().forEach((m,ri)=>{const idx=meals.length-1-ri;const el=document.createElement('div');el.className='card meal';el.innerHTML=`${m.photo?`<img src="${m.photo}" alt="Meal photo">`:'<div class="thumb" style="display:grid;place-items:center">🍽️</div>'}<div class="meal-main"><div class="meal-name"></div><div class="meal-meta">${m.type} · ${m.time||''} · ${m.protein||0}g protein</div></div><div><div class="meal-kcal">${m.calories}</div><div class="small">kcal</div><button data-del="${idx}" style="border:0;background:none;color:#999;padding:5px 0">delete</button></div>`;el.querySelector('.meal-name').textContent=m.name;root.appendChild(el)});root.querySelectorAll('[data-del]').forEach(b=>b.addEventListener('click',()=>{if(confirm('Delete this meal?')){day().splice(+b.dataset.del,1);persist();render()}}));renderVoice();renderBaseline()}
-function openMeal(){resetAnalysis();photoData='';$('#preview').hidden=true;$('#photoLabel').style.display='grid';$('#photo').value='';$('#name').value='';$('#calories').value='';$('#protein').value='';$('#type').value='Breakfast';$('#time').value=new Date().toTimeString().slice(0,5);$('#estimateMeal').disabled=true;$('#estimateBox').classList.remove('show');$('#mealDialog').showModal()}
-$('#addBtn').addEventListener('click',()=>$('#quickDialog').showModal());$('#quickCancel').addEventListener('click',()=>$('#quickDialog').close());$('#quickPhoto').addEventListener('click',()=>{$('#quickDialog').close();openMeal();setTimeout(()=>$('#photo').click(),80)});$('#quickManual').addEventListener('click',()=>{$('#quickDialog').close();openMeal()});$('#quickVoice').addEventListener('click',()=>{$('#quickDialog').close();switchTab('journal');setTimeout(()=>$('#recordVoice').click(),100)});$('#cancelMeal').addEventListener('click',()=>$('#mealDialog').close());
+// Some WKWebView versions can leave a <dialog> visible after close(). Explicitly
+// remove its open state as a fallback so every save/cancel action dismisses it.
+function openDialog(dialog){
+    if(!dialog)return;
+    dialog.style.removeProperty('display');
+    if(dialog.open)return;
+    if(typeof dialog.showModal==='function')dialog.showModal();
+    else dialog.setAttribute('open','');
+}
+function closeDialog(dialog){
+    if(!dialog)return;
+    try{if(dialog.open&&typeof dialog.close==='function')dialog.close()}catch(_){}
+    dialog.removeAttribute('open');
+    dialog.style.display='none';
+    requestAnimationFrame(()=>dialog.style.removeProperty('display'));
+}
+function openMeal(){resetAnalysis();photoData='';$('#preview').hidden=true;$('#photoLabel').style.display='grid';$('#photo').value='';$('#name').value='';$('#calories').value='';$('#protein').value='';$('#type').value='Breakfast';$('#time').value=new Date().toTimeString().slice(0,5);$('#estimateMeal').disabled=true;$('#estimateBox').classList.remove('show');openDialog($('#mealDialog'))}
+$('#addBtn').addEventListener('click',()=>openDialog($('#quickDialog')));$('#quickCancel').addEventListener('click',()=>closeDialog($('#quickDialog')));$('#quickPhoto').addEventListener('click',()=>{closeDialog($('#quickDialog'));openMeal();setTimeout(()=>$('#photo').click(),80)});$('#quickManual').addEventListener('click',()=>{closeDialog($('#quickDialog'));openMeal()});$('#quickVoice').addEventListener('click',()=>{closeDialog($('#quickDialog'));switchTab('journal');setTimeout(()=>$('#recordVoice').click(),100)});$('#cancelMeal').addEventListener('click',()=>closeDialog($('#mealDialog')));
 // Both old full endpoints and current base URLs resolve to exactly one route.
 function normalizeAPIURL(value){return value.trim().replace(/\/+$/,'').replace(/\/v1\/meals\/analyze-inline$/,'')}
 function checkedAPIURL(value){
@@ -143,7 +159,8 @@ $('#estimateMeal').addEventListener('click',async()=>{
         if(version===photoVersion){analysisController=null;btn.disabled=!photoData;btn.textContent='✨ Estimate from photo';$('#saveMeal').disabled=false}
     }
 });
-$('#saveMeal').addEventListener('click',()=>{const name=$('#name').value.trim(),cal=+$('#calories').value;if(!name||!Number.isFinite(cal)){alert('Add a meal name and calories first.');return}day().push({name,calories:cal,protein:+$('#protein').value||0,type:$('#type').value,time:$('#time').value,photo:photoData});persist();render();$('#mealDialog').close()});
+function saveMeal(){const name=$('#name').value.trim(),cal=+$('#calories').value;if(!name||!Number.isFinite(cal)){alert('Add a meal name and calories first.');return}day().push({name,calories:cal,protein:+$('#protein').value||0,type:$('#type').value,time:$('#time').value,photo:photoData});persist();render();closeDialog($('#mealDialog'))}
+$('#saveMeal').addEventListener('click',saveMeal);
 $('#checkAPI').addEventListener('click',async()=>{
     const button=$('#checkAPI'),status=$('#apiStatus'),controller=new AbortController();
     const timer=setTimeout(()=>controller.abort(),8000);button.disabled=true;
@@ -156,7 +173,9 @@ $('#checkAPI').addEventListener('click',async()=>{
     }catch(error){status.textContent=error.name==='AbortError'?'Connection timed out. Start the backend and check Wi-Fi.':error instanceof TypeError?'Cannot reach the API. Check the Mac’s Wi-Fi IP and allow Local Network access.':error.message}
     finally{clearTimeout(timer);button.disabled=false}
 });
-$('#settingsBtn').addEventListener('click',()=>{$('#targetCalories').value=state.targetCalories;$('#targetProtein').value=state.targetProtein;$('#apiBaseURL').value=state.apiBaseURL||'';$('#settingsDialog').showModal()});$('#cancelSettings').addEventListener('click',()=>$('#settingsDialog').close());$('#saveSettings').addEventListener('click',()=>{state.targetCalories=+$('#targetCalories').value||2000;state.targetProtein=+$('#targetProtein').value||120;state.apiBaseURL=normalizeAPIURL($('#apiBaseURL').value);persist();render();$('#settingsDialog').close()});
+$('#settingsBtn').addEventListener('click',()=>{$('#targetCalories').value=state.targetCalories;$('#targetProtein').value=state.targetProtein;$('#apiBaseURL').value=state.apiBaseURL||'';openDialog($('#settingsDialog'))});$('#cancelSettings').addEventListener('click',()=>closeDialog($('#settingsDialog')));
+function saveSettings(){state.targetCalories=+$('#targetCalories').value||2000;state.targetProtein=+$('#targetProtein').value||120;state.apiBaseURL=normalizeAPIURL($('#apiBaseURL').value);persist();render();closeDialog($('#settingsDialog'))}
+$('#saveSettings').addEventListener('click',saveSettings);
 
 function switchTab(tab){document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));$('#'+tab+'Panel').classList.add('active');$('#addBtn').style.display=tab==='today'?'block':'none';if(tab==='progress')renderProgress()}document.querySelectorAll('.nav-btn').forEach(btn=>btn.addEventListener('click',()=>switchTab(btn.dataset.tab)));$('#goWeekly').addEventListener('click',()=>{switchTab('journal');setTimeout(()=>$('#generateWeekly').scrollIntoView({behavior:'smooth',block:'center'}),50)});
 
