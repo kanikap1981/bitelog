@@ -5,6 +5,7 @@
 DerivedData/
 *.xcuserstate
 xcuserdata/
+**/*.xcodeproj/project.xcworkspace/
 
 # Python
 __pycache__/
