@@ -4,7 +4,7 @@ const html=fs.readFileSync(require('node:path').join(__dirname,'../BiteLog/Resou
 const nodes={},order=[];
 function $(id){return nodes[id] ||= {
  value:'',textContent:'',disabled:false,open:id.endsWith('Dialog'),
- style:{removeProperty(name){delete this[name]}},classList:{add(){},remove(){}},handlers:{},
+ style:{setProperty(name,value,priority){this[name]=value;this[name+'Priority']=priority},removeProperty(name){delete this[name];delete this[name+'Priority']}},classList:{add(){},remove(){}},handlers:{},
  addEventListener(name,fn){this.handlers[name]=fn},showModal(){this.open=true},
  close(){order.push('native-close')},setAttribute(name){if(name==='open')this.open=true},
  removeAttribute(name){if(name==='open'){this.open=false;order.push('close')}}
@@ -31,14 +31,15 @@ const click=()=>$('#estimateMeal').handlers.click();
  context.fetch=async()=>{throw new TypeError('Failed to fetch')};await click();assert.match($('#aiHint').textContent,/same Wi-Fi/);
  context.fetch=async()=>{const e=new Error();e.name='AbortError';throw e};await click();assert.match($('#aiHint').textContent,/timed out/);
  let resolve;context.fetch=()=>new Promise(r=>resolve=r);const pending=click();assert.equal($('#saveMeal').disabled,true);context.resetAnalysis();$('#name').value='New meal';resolve(response(estimate));await pending;assert.equal($('#name').value,'New meal');
- const meals=[];context.day=()=>meals;context.persist=()=>order.push('persist');context.render=()=>order.push('render');
+ const meals=[];context.day=()=>meals;context.persist=()=>order.push('persist');context.switchTab=tab=>order.push('tab:'+tab);context.render=()=>order.push('render');
  $('#name').value='Eggs';$('#calories').value='400';$('#protein').value='23.5';$('#type').value='Breakfast';$('#time').value='08:15';$('#mealDialog').open=true;order.length=0;
  context.saveMeal();
  assert.equal(JSON.stringify(meals),JSON.stringify([{name:'Eggs',calories:400,protein:23.5,type:'Breakfast',time:'08:15',photo:context.photoData}]));
- assert.equal($('#mealDialog').open,false);assert.deepEqual(order,['persist','render','native-close','close']);
+ assert.equal($('#mealDialog').open,false);assert.equal($('#mealDialog').style.display,'none');assert.equal($('#mealDialog').style.displayPriority,'important');assert.deepEqual(order,['persist','tab:today','render','native-close','close']);
+ context.openDialog($('#mealDialog'));assert.equal($('#mealDialog').open,true);assert.equal($('#mealDialog').style.display,undefined);
  context.state={targetCalories:2000,targetProtein:120,apiBaseURL:''};$('#targetCalories').value='2500';$('#targetProtein').value='150';$('#apiBaseURL').value='http://192.168.1.2:8000/';$('#settingsDialog').open=true;order.length=0;
  context.saveSettings();
  assert.deepEqual(context.state,{targetCalories:2500,targetProtein:150,apiBaseURL:'http://192.168.1.2:8000'});
- assert.equal($('#settingsDialog').open,false);assert.deepEqual(order,['persist','render','native-close','close']);
+ assert.equal($('#settingsDialog').open,false);assert.equal($('#settingsDialog').style.display,'none');assert.equal($('#settingsDialog').style.displayPriority,'important');assert.deepEqual(order,['persist','render','native-close','close']);
  console.log('PASS: photo analysis errors, cancellation, meal/settings persistence, and WKWebView dialog dismissal; complete app syntax');
 })().catch(err=>{console.error(err);process.exitCode=1});

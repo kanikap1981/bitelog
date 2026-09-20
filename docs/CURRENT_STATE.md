@@ -71,3 +71,13 @@ The selected folder is now the local Git checkout on branch `main`, with `origin
 - The UI regression test now proves meal persistence, Settings persistence, render-before-close ordering, and dismissal even when the simulated native `close()` is a no-op.
 - The fixed bundle built, installed, and launched on Kanika's physical iPhone. Final on-device interaction confirmation is still pending.
 - Backend logs then recorded three successful `/health` requests and two successful `POST /v1/meals/analyze-inline` requests from the physical iPhone at `10.0.0.217`, proving the in-app LAN and AI request path.
+
+## September 20, 2026 — persistent dismissal and meal visibility fix
+
+- Device feedback showed the first dialog fallback was still insufficient on the physical iPhone. The fallback now keeps `display: none !important` on a closed dialog until the next explicit open, preventing WKWebView from making the sheet visible again on a later frame.
+- Save meal now explicitly selects the Today tab before rendering and closing. The saved meal therefore appears in the Today list immediately, as well as contributing to daily totals.
+- Each logged meal has a clearer `Delete` action. Deleting still asks for confirmation, persists the removal, and refreshes daily totals and the list.
+- Settings Save uses the same persistent close helper, so saving the API URL and targets closes the Settings sheet.
+- The Settings sheet displays `BiteLog 1.2.1 · build 3`, making it possible to confirm that the corrected bundle is installed instead of an older cached build.
+- The corrected build installed and launched on Kanika's physical iPhone; Xcode reported `Running BiteLog on Kanika’s iPhone`. Final tap-through confirmation of Save and Delete behavior remains a device test.
+- Seven backend tests and the iOS JavaScript behavior test pass. The latter covers meal persistence, explicit Today selection, rendering, persistent WKWebView dismissal, reopening, Settings persistence, and Settings dismissal.

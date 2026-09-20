@@ -6,7 +6,7 @@ Branch: `main`.
 Selected project: `/Users/kanika/Documents/Healthapp/BiteLog-v1.2-production`.
 Remote: `https://github.com/kanikap1981/bitelog.git`. The remote was reachable but empty: it had no branches, refs, or commits, so there was nothing to pull and no ahead/behind comparison to perform. This folder was initialized as the first `main` checkout. Push has not been authorized and has not been performed.
 
-Proposed commit message: `Fix meal photo estimation reliability and document multi-device handoff`
+Proposed commit message: `Make meal and settings save dismissal persistent on iPhone`
 
 The initial local commit establishes the repository source of truth. Push it only after explicit user authorization. On another laptop, clone the remote, then follow the session-start workflow in `AGENTS.md`.
 
@@ -20,6 +20,8 @@ Fixed duplicated endpoint paths after legacy configuration migration; added URL/
 
 After physical-device feedback, fixed a shared WKWebView dialog issue: meal and Settings values persisted, but their sheets stayed open after Save. Direct `dialog.close()` calls were replaced with shared helpers that explicitly remove the dialog's `open` state and force immediate dismissal. The fixed bundle built, installed, and launched on Kanika's iPhone.
 
+After a second physical-device report, strengthened that fallback so the closed dialog remains `display: none !important` until the next explicit open. Save meal now switches to Today before rendering, where the new meal card and a clearer `Delete` action are visible. Settings Save uses the same persistent dismissal. Version `1.2.1` build `3` is displayed in Settings so testers can distinguish this bundle from older installs. Xcode installed and launched build 3 on Kanika's iPhone and reported `Running BiteLog on Kanika’s iPhone`.
+
 ## Changed files
 
 - `AGENTS.md` — multi-device workflow and product context.
@@ -29,6 +31,7 @@ After physical-device feedback, fixed a shared WKWebView dialog issue: meal and 
 - `backend/tests/test_photo_analysis.py` — seven route/provider regression tests with a valid synthetic PNG.
 - `backend/README.md` — troubleshooting/test guide link.
 - `ios/BiteLog/Resources/index.html` — URL migration, robust photo estimation and connection diagnostics.
+- `ios/BiteLog/Info.plist` — device-test version `1.2.1`, build `3`.
 - `ios/tests/photo-analysis.test.cjs` — actual bundled handler tests with controlled DOM/network.
 - `docs/PHOTO_ANALYSIS.md` — full contract, startup, device checks and evidence limits.
 - `docs/CURRENT_STATE.md` — updated evidence and repository blocker.
@@ -44,7 +47,7 @@ The updated checkout built, installed, and launched successfully through Xcode o
 
 Physical-iPhone backend logs now show three successful `/health` calls and two successful `POST /v1/meals/analyze-inline` calls from `10.0.0.217`; both analysis calls returned HTTP 200. This proves the in-app LAN and AI request path. Final Save-sheet interaction and nutrition accuracy remain unverified because the iPhone screen is not remotely controllable from this Mac. Full Xcode is installed at `/Users/kanika/Downloads/Xcode.app`, while shell `xcrun` still resolves to Command Line Tools unless `DEVELOPER_DIR` is set. Apple Health remains unvalidated and unchanged. Local HTTP, broad CORS, lack of API authentication/rate limits, and production-only API configuration are existing separate hardening tasks. The remote contained no prior Git history to audit.
 
-The latest UI regression test passes with native dialog closing deliberately simulated as a no-op. It verifies that Save meal persists the complete meal, renders the Today view, and dismisses the sheet; Save Settings persists targets/API URL, renders, and dismisses its sheet. The replacement build is on the physical device, but a final tap-through confirmation is pending.
+The latest UI regression test passes with native dialog closing deliberately simulated as a no-op. It verifies that Save meal persists the complete meal, explicitly selects Today, renders the meal list, and keeps the sheet hidden; reopening removes the forced hidden style. Save Settings persists targets/API URL, renders, and keeps its sheet hidden. Seven backend tests also pass. Build `1.2.1 (3)` is installed and running on the physical device, but a final tap-through confirmation is pending.
 
 ## Exact run commands
 
@@ -85,13 +88,16 @@ ipconfig getifaddr en0
 ```
 
 1. Open the selected project's `ios/BiteLogHealth.xcodeproj` in full Xcode, choose the existing signing team and iPhone, build and install.
-2. Put Mac and iPhone on the same Wi-Fi. In iPhone Safari open `http://<MAC-IP>:8000/health`; confirm `status: ok`.
-3. In BiteLog Settings enter `http://<MAC-IP>:8000`, tap Check API connection, then Save. Allow Local Network access if needed.
-4. Add a real meal photo and tap Estimate from photo. Check the name, calories, decimal protein, confidence and assumptions; edit if needed, then Save. Verify daily totals.
-5. Stop the backend and repeat: expect a readable connectivity error and usable manual entry. Restart and retry.
-6. Start an estimate, cancel and open a new meal; verify the old request cannot fill the new form.
-7. Record actual device and meal-photo results in CURRENT_STATE/HANDOFF before committing.
+2. Open Settings and confirm the footer says `BiteLog 1.2.1 · build 3`. If it does not, rebuild from this checkout before evaluating the fix.
+3. Put Mac and iPhone on the same Wi-Fi. In iPhone Safari open `http://<MAC-IP>:8000/health`; confirm `status: ok`.
+4. In BiteLog Settings enter `http://<MAC-IP>:8000`, tap Check API connection, then Save. Confirm Settings closes. Allow Local Network access if needed.
+5. Add a meal manually or from a real photo. For a photo, tap Estimate from photo and check the name, calories, decimal protein, confidence and assumptions. Edit if needed, then tap Save meal.
+6. Confirm the meal sheet closes, the app shows Today, and the new meal card is visible with matching calories and protein.
+7. Tap `Delete` on that meal, confirm deletion, and verify the card and its contribution to daily totals disappear.
+8. Stop the backend and repeat photo estimation: expect a readable connectivity error and usable manual entry. Restart and retry.
+9. Start an estimate, cancel and open a new meal; verify the old request cannot fill the new form.
+10. Record actual device and meal-photo results in CURRENT_STATE/HANDOFF before the next commit.
 
 ## Next recommended task
 
-On the running physical iPhone, confirm Save closes Settings. Then estimate or manually enter a meal, tap Save meal, and confirm the sheet closes and the meal card appears on Today. If that passes, validate a real meal photo while watching the backend request log and record the result here. After that, move to native HealthKit authorization/steps/activity validation. Push the local commits only after explicit authorization.
+On the running physical iPhone, confirm the Settings footer is `BiteLog 1.2.1 · build 3`, then complete the Save meal, Today card, Delete, and Settings Save tap-through above. If that passes, validate nutrition accuracy with a real meal photo while watching the backend request log and record the result here. After that, move to native HealthKit authorization/steps/activity validation. Push the local commits only after explicit authorization.
