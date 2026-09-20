@@ -23,7 +23,7 @@
 
 ## Still unresolved / unverified
 - Apple Health appears in capabilities but sync is not confirmed working.
-- Photo estimation has passed automated route/UI-handler tests and a live provider contract smoke test. The updated source build also built, installed, and launched on Kanika's physical iPhone. In-app LAN configuration, a real meal photo, and nutrition accuracy remain unverified.
+- Photo estimation has passed automated route/UI-handler tests, a live provider contract smoke test, and physical-iPhone API requests. The updated source build built, installed, and launched on Kanika's iPhone; the device reached `/health` and received HTTP 200 from two photo-analysis requests. Final Save-sheet interaction and nutrition accuracy remain unverified.
 - Existing `gpt-5.6-luna` model and Responses API schema were checked against current official documentation and passed the live contract smoke test.
 - Current local networking uses HTTP for development only.
 
@@ -70,3 +70,4 @@ The selected folder is now the local Git checkout on branch `main`, with `origin
 - All dialogs now use shared `openDialog` / `closeDialog` helpers. Closing still calls the native API, then explicitly removes the `open` state and forces immediate visual dismissal as a WebKit fallback.
 - The UI regression test now proves meal persistence, Settings persistence, render-before-close ordering, and dismissal even when the simulated native `close()` is a no-op.
 - The fixed bundle built, installed, and launched on Kanika's physical iPhone. Final on-device interaction confirmation is still pending.
+- Backend logs then recorded three successful `/health` requests and two successful `POST /v1/meals/analyze-inline` requests from the physical iPhone at `10.0.0.217`, proving the in-app LAN and AI request path.
