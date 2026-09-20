@@ -23,7 +23,7 @@
 
 ## Still unresolved / unverified
 - Apple Health appears in capabilities but sync is not confirmed working.
-- Photo estimation has passed automated route/UI-handler tests and a live provider contract smoke test. Physical iPhone photo estimation and real meal-photo accuracy remain unverified.
+- Photo estimation has passed automated route/UI-handler tests and a live provider contract smoke test. The updated source build also built, installed, and launched on Kanika's physical iPhone. In-app LAN configuration, a real meal photo, and nutrition accuracy remain unverified.
 - Existing `gpt-5.6-luna` model and Responses API schema were checked against current official documentation and passed the live contract smoke test.
 - Current local networking uses HTTP for development only.
 
@@ -55,9 +55,9 @@ Do not copy Browserbase text or brand identity.
 - The estimate retains decimal protein values, displays confidence/assumptions, and requires athlete confirmation before save.
 - Settings includes a `/health` connection check. Backend responses/logs have request IDs without logging photos or credentials.
 - Seven backend unittest cases pass with the existing Python 3.9.6 environment; Node handler tests pass. No dependency versions changed.
-- A live route call using a valid synthetic PNG returned HTTP 200 and all six structured fields. A real meal photo and on-device networking/build still need validation.
+- A live route call using a valid synthetic PNG returned HTTP 200 and all six structured fields. The backend was also reachable through the Mac's active LAN address, `http://10.0.0.214:8000/health`, and Xcode reported `Running BiteLog on Kanika's iPhone` for this checkout. A real meal photo and the in-app LAN request still need validation.
 - No OpenAI key patterns were found in iOS source. The GitHub repository was empty when connected, so there was no prior Git history to audit.
-- This host has Xcode Command Line Tools selected; a full Xcode installation/build was unavailable during this task.
+- Full Xcode is installed at `/Users/kanika/Downloads/Xcode.app` even though the shell's active developer directory still points to Command Line Tools. The build was run through the Xcode UI against the physical device.
 
 ## Repository continuity
 

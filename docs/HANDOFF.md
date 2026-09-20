@@ -38,7 +38,9 @@ Seven backend test cases pass on the existing Python 3.9.6 virtualenv without de
 
 Live provider smoke test through the actual FastAPI route returned HTTP 200 with all six fields using `gpt-5.6-luna` and the existing sibling backend's server configuration. This used a 64×64 synthetic PNG, not a meal: it proves credentials/connectivity and schema compatibility, not nutrition accuracy. An earlier one-pixel image had a bad CRC and was rejected; the automated fixture was corrected. Requests required network permission outside the sandbox.
 
-Physical iPhone LAN connection, the full WKWebView flow, a signed build, and real-meal estimation remain unverified. Full Xcode is not available on this host. Apple Health remains unvalidated and unchanged. Local HTTP, broad CORS, lack of API authentication/rate limits, and production-only API configuration are existing separate hardening tasks. The remote contained no prior Git history to audit.
+The updated checkout built, installed, and launched successfully through Xcode on `Kanika's iPhone`; Xcode reported `Running BiteLog on Kanika's iPhone`. The backend was started from this checkout with the existing sibling Python 3.9 environment and server `.env`, and both `http://127.0.0.1:8000/health` and `http://10.0.0.214:8000/health` returned HTTP 200. The iPhone initially had to be unlocked before Xcode could launch the app.
+
+The physical in-app LAN request, full WKWebView photo flow, and real-meal estimation remain unverified because the iPhone screen is not remotely controllable from this Mac. Full Xcode is installed at `/Users/kanika/Downloads/Xcode.app`, while shell `xcrun` still resolves to Command Line Tools unless `DEVELOPER_DIR` is set. Apple Health remains unvalidated and unchanged. Local HTTP, broad CORS, lack of API authentication/rate limits, and production-only API configuration are existing separate hardening tasks. The remote contained no prior Git history to audit.
 
 ## Exact run commands
 
@@ -88,4 +90,4 @@ ipconfig getifaddr en0
 
 ## Next recommended task
 
-After the initial commit is pushed with explicit authorization, validate the real iPhone photo flow with a meal and record results. Only after that move to native HealthKit authorization/steps/activity validation.
+On the running physical iPhone, open BiteLog Settings, set the API URL to `http://10.0.0.214:8000`, tap **Check API connection**, save, and estimate a real meal photo while watching the backend request log. Record the result here. After that, move to native HealthKit authorization/steps/activity validation. Push the local commits only after explicit authorization.
