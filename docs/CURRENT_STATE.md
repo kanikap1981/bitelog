@@ -118,3 +118,18 @@ The selected folder is now the local Git checkout on branch `main`, with `origin
 - Xcode detected Kanika’s iPhone 17 Pro as connected.
 - BiteLog 1.5.1 build 10 compiled and signed for the physical device with the existing HealthKit entitlement and provisioning profile.
 - `devicectl` installed bundle `com.kanikapandey.BiteLog` successfully. The app was not launched remotely; confirm the new typography and palette manually on the phone.
+
+
+## October 17, 2026 — faster photo estimation (1.5.2 build 11)
+
+- Phone photos are reduced from a maximum 900px/0.76 JPEG to 640px/0.68 before upload.
+- The server now requests `detail: low` instead of `detail: high`; the response contract and server-only API key are unchanged.
+- Privacy-safe provider logs include model, detail, status, and duration without image data or credentials.
+- A live route request returned all six structured fields in 3.10 seconds, with 3.05 seconds spent in the provider call.
+- All 14 backend tests and the bundled UI behavior test pass. Build 11 built, signed, and installed successfully on Kanika’s iPhone.
+
+
+## October 17, 2026 — home logo (1.5.3 build 12)
+
+- The Today header now uses the selected BiteLog wordmark with a large capital `B`, smaller `log`, and the existing dark green accent dot.
+- Build 12 compiled, signed, and installed successfully on the connected iPhone. Physical-device visual confirmation remains manual.

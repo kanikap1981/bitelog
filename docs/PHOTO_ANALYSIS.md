@@ -2,7 +2,7 @@
 
 ## Contract (preserved)
 
-The bundled iOS HTML UI resizes a photo to at most 900 pixels on its longest edge and encodes JPEG at 0.76 quality. It sends:
+The bundled iOS HTML UI resizes a photo to at most 640 pixels on its longest edge and encodes JPEG at 0.68 quality for a smaller Wi-Fi upload. It sends:
 
 `POST /v1/meals/analyze-inline`, `Content-Type: application/json`
 
@@ -14,7 +14,7 @@ Success is a JSON object containing `name` (nonempty string), `calories` (intege
 
 Errors use a non-2xx status and a readable `detail` string. Every response includes `X-Request-ID`, also shown in photo errors for troubleshooting. Logs contain request ID, route, status and duration; they do not contain photos, API keys, or provider error bodies.
 
-The backend alone calls `https://api.openai.com/v1/responses`. Its existing `gpt-5.6-luna` default and strict `text.format` JSON schema are preserved. Verified against official documentation on September 20, 2026:
+The backend alone calls `https://api.openai.com/v1/responses`. Its existing `gpt-5.6-luna` default and strict `text.format` JSON schema are preserved. Meal photos use `detail: low`, which the official vision guide defines for coarse image understanding; this avoids unnecessary high-detail processing for visible food identification and rough portion estimation. Verified against official documentation on September 20, 2026:
 - https://developers.openai.com/api/docs/models/gpt-5.6-luna
 - https://developers.openai.com/api/docs/guides/images-vision
 - https://developers.openai.com/api/docs/guides/structured-outputs
@@ -69,4 +69,4 @@ Backend tests use a valid tiny PNG and mocked provider HTTP responses. They exer
 
 Verified in the task workspace using the existing Python 3.9.6 environment: success contract, invalid/oversized upload rejection, missing key, provider failures, timeout, refusal/incomplete output, malformed estimates, CORS from a bundled-file origin, URL migration, network errors, precision of protein values, and stale response cancellation.
 
-A live request through the FastAPI route to OpenAI using the existing server-side configuration and a valid 64×64 synthetic PNG returned HTTP 200 with all six expected fields. This establishes provider connectivity and contract compatibility; it does not establish nutrition accuracy. A first one-pixel fixture was rejected because its PNG CRC was invalid; the regression fixture now uses the valid image. Physical iPhone, real meal-photo accuracy, and a signed Xcode build remain unverified. This host currently exposes only Xcode Command Line Tools, not an available full Xcode installation. No HealthKit functionality was changed. Local HTTP remains development-only; production authentication and HTTPS remain separate work.
+A live request through the optimized FastAPI route to OpenAI using the existing server-side configuration and a valid 64×64 synthetic PNG returned HTTP 200 with all six expected fields in 3.10 seconds; provider processing was 3.05 seconds. This establishes provider connectivity and contract compatibility; it does not establish nutrition accuracy. A first one-pixel fixture was rejected because its PNG CRC was invalid; the regression fixture now uses the valid image. BiteLog 1.5.2 build 11 built, signed, and installed on the physical iPhone. Real meal-photo speed and nutrition accuracy remain manual device checks. Full Xcode is available at `/Users/kanika/Downloads/Xcode.app`. No HealthKit functionality was changed. Local HTTP remains development-only; production authentication and HTTPS remain separate work.

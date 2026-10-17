@@ -32,6 +32,7 @@ class PhotoAnalysisTests(unittest.TestCase):
             self.assertEqual(url, 'https://api.openai.com/v1/responses')
             body = kwargs['json']
             self.assertEqual(body['input'][0]['content'][1]['image_url'], PHOTO)
+            self.assertEqual(body['input'][0]['content'][1]['detail'], 'low')
             self.assertEqual(body['text']['format']['type'], 'json_schema')
             self.assertTrue(body['text']['format']['strict'])
             self.assertFalse(body['store'])

@@ -7,7 +7,7 @@
 - Remote: `https://github.com/kanikap1981/bitelog.git`
 - Remote state at session start: reachable and empty, with no refs to pull.
 - Push authorization: not granted. Commit locally and stop before push.
-- Proposed commit: `Simplify BiteLog color and typography system`
+- Proposed commit: `Speed up meal photo estimation`
 
 ## Completed
 
@@ -165,3 +165,78 @@ All checks pass. Browser screenshots were reviewed for Today, Progress, and the 
 ### Physical-device installation — build 10
 
 `BiteLog 1.5.1 (10)` built and installed successfully on the connected iPhone 17 Pro using bundle ID `com.kanikapandey.BiteLog`. Open the app manually, confirm the Settings version footer, then complete the palette/typography, meal logging, plan, voice, and Apple Health checks already listed above.
+
+
+## October 17, 2026 — photo estimation latency
+
+### Completed
+
+- Reduced phone photo upload dimensions/quality to 640px and JPEG 0.68.
+- Changed the OpenAI image input from high to low detail while preserving structured name, calories, protein, confidence, description, and assumptions.
+- Added privacy-safe provider duration logging and a regression assertion for low detail.
+- Live test: HTTP 200 with all fields in 3.10 seconds; provider duration 3.05 seconds.
+- BiteLog 1.5.2 build 11 built, signed, and installed on the connected iPhone.
+
+### Files changed
+
+- `backend/app/services/openai_meal_analyzer.py`
+- `backend/tests/test_photo_analysis.py`
+- `ios/BiteLog/Resources/index.html`
+- `ios/BiteLog/Info.plist`
+- `docs/PHOTO_ANALYSIS.md`, `docs/CURRENT_STATE.md`, and `docs/HANDOFF.md`
+
+### Exact validation
+
+```bash
+cd /Users/kanika/Documents/Healthapp/BiteLog-v1.2-production
+node ios/tests/photo-analysis.test.cjs
+cd backend
+PYTHONDONTWRITEBYTECODE=1 /Users/kanika/Documents/Healthapp/BiteLogproduction/backend/.venv/bin/python -m unittest discover -s tests -v
+```
+
+### Next recommended test
+
+Open build 11, confirm the Settings footer, photograph a real meal, and time from tapping Estimate to seeing the fields. Watch the running backend for `meal_provider ... duration_ms=...`. If real photos are still materially slower than the 3.1-second synthetic request, compare payload size and provider duration before making another quality tradeoff.
+
+
+## October 17, 2026 — home logo and build 12
+
+### Completed
+
+- Replaced the plain lowercase header text with the selected BiteLog wordmark: a prominent capital `B`, smaller `log`, and restrained green dot.
+- Kept the logo in the Today header so it is immediately visible on app open.
+- Bumped the iOS app to 1.5.3 build 12, built it with the existing development team, and installed it on the connected iPhone 17 Pro.
+- Current branch: `main`.
+
+### Files changed
+
+- `ios/BiteLog/Resources/index.html` — home wordmark and visible build number.
+- `ios/BiteLog/Info.plist` — version 1.5.3 build 12.
+- `docs/CURRENT_STATE.md` and `docs/HANDOFF.md` — continuation details.
+
+### Exact run commands
+
+```bash
+cd /Users/kanika/Documents/Healthapp/BiteLog-v1.2-production
+/Users/kanika/Downloads/Xcode.app/Contents/Developer/usr/bin/xcodebuild \
+  -project ios/BiteLogHealth.xcodeproj -scheme BiteLog -configuration Debug \
+  -destination generic/platform=iOS -derivedDataPath /tmp/BiteLogLogoDerived \
+  DEVELOPMENT_TEAM=YX8ZU7XXF4 CODE_SIGN_STYLE=Automatic \
+  -allowProvisioningUpdates build
+DEVELOPER_DIR=/Users/kanika/Downloads/Xcode.app/Contents/Developer xcrun devicectl device install app \
+  --device F6C55681-B06F-5583-A7D3-CB0D887F7B56 \
+  /tmp/BiteLogLogoDerived/Build/Products/Debug-iphoneos/BiteLog.app
+```
+
+### Exact test steps
+
+1. Open BiteLog manually on the iPhone.
+2. Confirm the Today header shows a large `B` with smaller `log` beside it.
+3. Open Settings and confirm `BiteLog 1.5.3 · build 12`.
+4. Photograph a real meal, tap Estimate, and time the result to validate the photo-speed change on real food.
+
+### Known issues and next recommended task
+
+- Final logo spacing and scale need visual confirmation on the physical phone.
+- Real meal-photo latency and nutrition accuracy still need a device check; the measured 3.10 seconds used a synthetic image.
+- Next: confirm the logo and photo estimation together on build 12 before making another design or quality tradeoff.

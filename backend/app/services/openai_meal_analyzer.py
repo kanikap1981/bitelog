@@ -1,6 +1,7 @@
 import asyncio
 import json
 import logging
+import time
 from typing import Any
 
 import httpx
@@ -66,7 +67,7 @@ async def analyze_meal(image_url: str, settings: Settings) -> MealEstimate:
             "role": "user",
             "content": [
                 {"type": "input_text", "text": "Estimate this meal from the photo."},
-                {"type": "input_image", "image_url": image_url, "detail": "high"},
+                {"type": "input_image", "image_url": image_url, "detail": "low"},
             ],
         }],
         "text": {
@@ -84,6 +85,7 @@ async def analyze_meal(image_url: str, settings: Settings) -> MealEstimate:
         "Content-Type": "application/json",
     }
     timeout = httpx.Timeout(45.0, connect=10.0)
+    started = time.monotonic()
     try:
         async with httpx.AsyncClient(timeout=timeout) as client:
             response = await asyncio.wait_for(
@@ -94,6 +96,11 @@ async def analyze_meal(image_url: str, settings: Settings) -> MealEstimate:
         raise MealAnalysisError("Photo analysis timed out. Please try again.", 504) from exc
     except httpx.RequestError as exc:
         raise MealAnalysisError("The server could not reach the photo analysis service. Please try again.", 503) from exc
+
+    logger.info(
+        "meal_provider model=%s detail=low status=%s duration_ms=%d",
+        settings.openai_model, response.status_code, (time.monotonic() - started) * 1000,
+    )
 
     if response.status_code >= 400:
         # Never echo provider bodies: they may contain credentials or submitted content.
