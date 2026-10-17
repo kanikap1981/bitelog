@@ -487,3 +487,53 @@ DEVELOPER_DIR=/Users/kanika/Downloads/Xcode.app/Contents/Developer xcrun devicec
 - Final spacing and type approval remains a manual physical-device review.
 - Apple Health still needs a complete physical-device permission and data validation pass.
 - Next: capture specific visual feedback from build 18, then do one focused polish pass without changing the established component hierarchy.
+
+
+## October 17, 2026 — purpose-led tab introductions (1.6.0 build 19)
+
+### Completed
+
+- Matched meal-name typography to nutrition row labels and added the same restrained green dot to every meal row.
+- Removed repeated Journal, Nutrition plan, and Weekly progress page headings where the tab bar already provides context.
+- Added original lightweight illustrations and purpose-led copy to the Journal and Plan introductions.
+- Restyled This week's notes with the same soft-green card language as the seven-day Progress overview.
+- Made the seven-day overview the immediate first element on Progress.
+- Built, signed, and installed BiteLog 1.6.0 build 19 on the connected iPhone 17 Pro.
+- Current branch: `main`.
+
+### Files changed
+
+- `ios/BiteLog/Resources/index.html`
+- `ios/BiteLog/Info.plist`
+- `docs/CURRENT_STATE.md` and `docs/HANDOFF.md`
+
+### Exact run commands
+
+```bash
+cd /Users/kanika/Documents/Healthapp/BiteLog-v1.2-production
+node ios/tests/photo-analysis.test.cjs
+plutil -lint ios/BiteLog/Info.plist
+git diff --check
+/Users/kanika/Downloads/Xcode.app/Contents/Developer/usr/bin/xcodebuild \
+  -project ios/BiteLogHealth.xcodeproj -scheme BiteLog -configuration Debug \
+  -destination generic/platform=iOS -derivedDataPath /tmp/BiteLogEditorialDerived \
+  DEVELOPMENT_TEAM=YX8ZU7XXF4 CODE_SIGN_STYLE=Automatic \
+  -allowProvisioningUpdates build
+DEVELOPER_DIR=/Users/kanika/Downloads/Xcode.app/Contents/Developer xcrun devicectl device install app \
+  --device F6C55681-B06F-5583-A7D3-CB0D887F7B56 \
+  /tmp/BiteLogEditorialDerived/Build/Products/Debug-iphoneos/BiteLog.app
+```
+
+### Exact test steps
+
+1. Open build 19 and confirm each meal name matches the nutrition-label weight and begins with a green dot.
+2. Open Journal and confirm the illustrated introduction replaces the repeated Journal heading.
+3. Confirm This week's notes uses the soft-green overview style and saved notes remain readable and deletable.
+4. Open Plan and confirm the illustrated dietitian-guidance introduction replaces the repeated Nutrition plan heading.
+5. Open Progress and confirm the seven-day overview is the first element with no loud Weekly progress heading above it.
+
+### Known issues and next recommended task
+
+- Final illustration scale, copy, and spacing approval remains a manual physical-device review.
+- Apple Health still needs a complete physical-device permission and data validation pass.
+- Next: review build 19 visually and refine only specific rejected elements.

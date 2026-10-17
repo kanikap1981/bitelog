@@ -170,3 +170,11 @@ The selected folder is now the local Git checkout on branch `main`, with `origin
 - Today now uses matching cards for Daily nutrition, Meals today, and Movement; redundant Activity and Apple Health headings were removed.
 - Journal, Plan, and Progress now share the same lighter page titles, card-title scale, card geometry, supporting text, and button weight.
 - The JavaScript behavior/syntax test, plist validation, diff validation, signed device build, and physical-device installation pass.
+
+
+## October 17, 2026 — illustrated tab introductions (1.6.0 build 19)
+
+- Meal rows now use the nutrition label type scale and green-dot motif.
+- Journal and Plan use illustrated purpose cards instead of repeated page-name headings, while Progress opens directly on the seven-day overview.
+- This week's notes now uses the approved soft-green overview treatment.
+- The JavaScript behavior/syntax test, plist validation, diff validation, signed device build, and physical-device installation pass.
