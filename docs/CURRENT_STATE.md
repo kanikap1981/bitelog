@@ -163,3 +163,10 @@ The selected folder is now the local Git checkout on branch `main`, with `origin
 - Today now has one compact header row with the BiteLog identity, centered day/date, and settings.
 - Daily calories, protein, remaining calories, and progress bars now live in one restrained nutrition card with smaller values.
 - The JavaScript behavior/syntax test, plist validation, diff validation, signed device build, and physical-device installation pass.
+
+
+## October 17, 2026 — unified cards and typography (1.5.9 build 18)
+
+- Today now uses matching cards for Daily nutrition, Meals today, and Movement; redundant Activity and Apple Health headings were removed.
+- Journal, Plan, and Progress now share the same lighter page titles, card-title scale, card geometry, supporting text, and button weight.
+- The JavaScript behavior/syntax test, plist validation, diff validation, signed device build, and physical-device installation pass.

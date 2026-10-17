@@ -437,3 +437,53 @@ DEVELOPER_DIR=/Users/kanika/Downloads/Xcode.app/Contents/Developer xcrun devicec
 - Final spacing and type approval remains a manual physical-device review.
 - Apple Health still needs a full physical-device permission and data validation pass.
 - Next: review the Today screen on the iPhone and refine only the specific elements that still feel visually heavy or misaligned.
+
+
+## October 17, 2026 — unified card system (1.5.9 build 18)
+
+### Completed
+
+- Moved Meals today into one white card that matches Daily nutrition, with a light header and embedded meal rows.
+- Removed the redundant Activity / Apple Health heading above movement and simplified the connected and disconnected movement cards.
+- Reduced bold type across nutrition, meals, movement, Journal, Plan, and Progress.
+- Standardized page headings, card titles, padding, radii, supporting text, buttons, and vertical rhythm across all four tabs.
+- Preserved the approved green action and Progress/Journal section accents.
+- Built, signed, and installed BiteLog 1.5.9 build 18 on the connected iPhone 17 Pro.
+- Current branch: `main`.
+
+### Files changed
+
+- `ios/BiteLog/Resources/index.html`
+- `ios/BiteLog/Info.plist`
+- `docs/CURRENT_STATE.md` and `docs/HANDOFF.md`
+
+### Exact run commands
+
+```bash
+cd /Users/kanika/Documents/Healthapp/BiteLog-v1.2-production
+node ios/tests/photo-analysis.test.cjs
+plutil -lint ios/BiteLog/Info.plist
+git diff --check
+/Users/kanika/Downloads/Xcode.app/Contents/Developer/usr/bin/xcodebuild \
+  -project ios/BiteLogHealth.xcodeproj -scheme BiteLog -configuration Debug \
+  -destination generic/platform=iOS -derivedDataPath /tmp/BiteLogConsistentDerived \
+  DEVELOPMENT_TEAM=YX8ZU7XXF4 CODE_SIGN_STYLE=Automatic \
+  -allowProvisioningUpdates build
+DEVELOPER_DIR=/Users/kanika/Downloads/Xcode.app/Contents/Developer xcrun devicectl device install app \
+  --device F6C55681-B06F-5583-A7D3-CB0D887F7B56 \
+  /tmp/BiteLogConsistentDerived/Build/Products/Debug-iphoneos/BiteLog.app
+```
+
+### Exact test steps
+
+1. Open build 18 and review Today: Daily nutrition, Meals today, and Movement should appear as three consistent white cards.
+2. Confirm there is no separate Activity / Apple Health heading above Movement.
+3. Add or delete a meal and confirm its embedded row and nutrition totals update.
+4. Review Journal, Plan, and Progress and compare their page headings, card titles, padding, corners, supporting text, and buttons.
+5. Connect or sync Health and confirm the Movement card changes state without altering the card hierarchy.
+
+### Known issues and next recommended task
+
+- Final spacing and type approval remains a manual physical-device review.
+- Apple Health still needs a complete physical-device permission and data validation pass.
+- Next: capture specific visual feedback from build 18, then do one focused polish pass without changing the established component hierarchy.
