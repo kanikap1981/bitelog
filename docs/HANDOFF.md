@@ -51,7 +51,7 @@ The real five-page `Kanika Pandey V8.pdf` was saved, reopened, and analyzed thro
 
 ## Known issues
 
-- The iPhone was connected but locked when build 9 was ready, so iOS rejected the developer-image mount and the final app was not installed. Unlock it, then use the install command below.
+- BiteLog 1.5.1 build 10 is installed on Kanika’s iPhone. Visual approval and the physical-device interaction pass remain manual checks.
 - Apple Health authorization, steps, active energy, and workout minutes still need validation on the physical iPhone.
 - Data is local-only in localStorage/IndexedDB. Uninstalling BiteLog removes its meals, journal, profile, and saved plan.
 - Numeric estimates can vary between analyses when the source plan has no explicit totals. They are guidance inferred from portions and remain visibly labeled as estimates.
@@ -158,5 +158,10 @@ All checks pass. Browser screenshots were reviewed for Today, Progress, and the 
 ### Known issues and next recommended task
 
 - This is a reasoned design direction, not product-specific conversion evidence. Validate it with athletes using a simple preference/usability test before treating the palette as final.
-- Install build 10 on the physical iPhone and check type size, contrast, safe areas, camera/microphone sheets, and Apple Health behavior.
+- Build 10 is installed on the physical iPhone. Check type size, contrast, safe areas, camera/microphone sheets, and Apple Health behavior.
 - Apple Health remains the first unresolved native integration. Local-only persistence and development API hardening limits remain unchanged.
+
+
+### Physical-device installation — build 10
+
+`BiteLog 1.5.1 (10)` built and installed successfully on the connected iPhone 17 Pro using bundle ID `com.kanikapandey.BiteLog`. Open the app manually, confirm the Settings version footer, then complete the palette/typography, meal logging, plan, voice, and Apple Health checks already listed above.

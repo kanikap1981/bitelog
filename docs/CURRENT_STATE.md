@@ -97,7 +97,7 @@ The selected folder is now the local Git checkout on branch `main`, with `origin
 
 ### Remaining limits
 
-- The iPhone reconnected, but it was locked, so iOS refused to mount the developer image and the final install did not complete. The signed app exists at `/tmp/BiteLogDerived/Build/Products/Debug-iphoneos/BiteLog.app`; unlock the phone and retry the install.
+- BiteLog 1.5.1 build 10 built, signed, and installed successfully on Kanika’s connected iPhone. Final visual and interaction confirmation remains a manual device check.
 - Apple Health still needs a physical-device permission and data validation pass.
 - Meals, profile, extracted plan data, and the original plan currently live only in the app's local WebView storage. There is no user account, cloud sync, or server database yet, so deleting the app removes local data.
 - The local development backend uses HTTP, broad CORS, and no API authentication. Production deployment and hardening remain future work.
@@ -111,3 +111,10 @@ The selected folder is now the local Git checkout on branch `main`, with `origin
 - Typography now uses the iOS system sans-serif with a calmer hierarchy inspired by Spotify's content-first rhythm: one strong page title, medium section headings, regular body copy, sentence-case labels, and reduced letter compression.
 - Marketing-style headings were simplified to direct names such as “Today’s targets,” “Weekly progress,” “Your nutrition plan,” and “Add to BiteLog.”
 - Visual browser checks covered Today, Progress, and the Add sheet. The JavaScript regression test, Info.plist validation, diff check, and iPhone 17 simulator build pass.
+
+
+## October 17, 2026 — build 10 physical-device installation
+
+- Xcode detected Kanika’s iPhone 17 Pro as connected.
+- BiteLog 1.5.1 build 10 compiled and signed for the physical device with the existing HealthKit entitlement and provisioning profile.
+- `devicectl` installed bundle `com.kanikapandey.BiteLog` successfully. The app was not launched remotely; confirm the new typography and palette manually on the phone.
