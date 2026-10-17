@@ -15,9 +15,9 @@
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>CFBundleShortVersionString</key>
-    <string>1.6.1</string>
+    <string>1.6.2</string>
     <key>CFBundleVersion</key>
-    <string>20</string>
+    <string>21</string>
     <key>UILaunchScreen</key>
     <dict/>
     <key>NSHealthShareUsageDescription</key>
@@ -38,13 +38,5 @@
     <array>
         <string>UIInterfaceOrientationPortrait</string>
     </array>
-
-	<key>NSLocalNetworkUsageDescription</key>
-	<string>BiteLog can connect to your development API on your local network while you test the app.</string>
-	<key>NSAppTransportSecurity</key>
-	<dict>
-		<key>NSAllowsLocalNetworking</key>
-		<true/>
-	</dict>
 </dict>
 </plist>

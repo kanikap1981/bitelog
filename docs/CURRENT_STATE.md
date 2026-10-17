@@ -184,3 +184,12 @@ The selected folder is now the local Git checkout on branch `main`, with `origin
 
 - Redundant Journal guidance is removed. Saved reflections now use regular sentence text in spacious light tiles inside the soft-green notes card.
 - The JavaScript behavior/syntax test, plist validation, diff validation, signed device build, and physical-device installation pass.
+
+
+## October 17, 2026 — production backend and build 21
+
+- Production FastAPI is live at `https://bitelog-api.vercel.app`; OpenAI configuration is stored only in protected Vercel environment settings.
+- Live production checks pass for health, the supplied dietitian PDF, photo meal estimation, and voice meal transcription/estimation.
+- BiteLog 1.6.2 build 21 uses the HTTPS backend automatically, migrates existing installs away from the Mac LAN URL, and no longer requests local-network access.
+- All 14 backend tests, the iOS JavaScript behavior/syntax test, plist validation, signed device build, physical-device installation, and production error-log scan pass.
+- The GitHub remote is still empty because command-line GitHub authentication is missing; the local branch contains the complete history.

@@ -585,3 +585,67 @@ DEVELOPER_DIR=/Users/kanika/Downloads/Xcode.app/Contents/Developer xcrun devicec
 
 - Final tile spacing and text-size approval remains a manual physical-device review.
 - Next: review build 20 on the iPhone, then continue only with specific rejected visual elements.
+
+
+## October 17, 2026 — production HTTPS backend and app connection (1.6.2 build 21)
+
+### Completed
+
+- Deployed the existing FastAPI service to Vercel at `https://bitelog-api.vercel.app`.
+- Added the production `app/main.py` function configuration with a 120-second maximum duration and excluded tests/cache files.
+- Stored `OPENAI_API_KEY` as a sensitive Vercel environment value; the key remains server-side and is not in Git or the iOS bundle.
+- Verified production `GET /health` returns HTTP 200.
+- Verified the supplied `Kanika Pandey V8.pdf` returns structured daily/weekly calorie and protein targets, summary, and assumptions.
+- Verified a generated meal image returns name, calories, protein, confidence, and assumptions.
+- Verified a generated spoken meal returns the transcript and structured nutrition estimate.
+- Changed the iOS app from the Mac LAN address to the production HTTPS API and forced existing installs to migrate to the bundled production origin.
+- Removed development-only local-network and App Transport Security exceptions from the iOS app.
+- Built, signed, and installed BiteLog 1.6.2 build 21 on the connected iPhone 17 Pro.
+- Current branch: `main`.
+
+### Files changed
+
+- `backend/vercel.json`
+- `backend/.gitignore`
+- `backend/README.md`
+- `ios/BiteLog/Resources/index.html`
+- `ios/BiteLog/Info.plist`
+- `docs/CURRENT_STATE.md` and `docs/HANDOFF.md`
+
+### Exact run commands
+
+```bash
+cd /Users/kanika/Documents/Healthapp/BiteLog-v1.2-production/backend
+PYTHONDONTWRITEBYTECODE=1 /Users/kanika/Documents/Healthapp/BiteLogproduction/backend/.venv/bin/python -m unittest discover -s tests -v
+vercel deploy --prod --yes --scope kanikas-projects-b4c58d2f
+curl https://bitelog-api.vercel.app/health
+cd ..
+node ios/tests/photo-analysis.test.cjs
+plutil -lint ios/BiteLog/Info.plist
+git diff --check
+/Users/kanika/Downloads/Xcode.app/Contents/Developer/usr/bin/xcodebuild \
+  -project ios/BiteLogHealth.xcodeproj -scheme BiteLog -configuration Debug \
+  -destination generic/platform=iOS -derivedDataPath /tmp/BiteLogProductionDerived \
+  DEVELOPMENT_TEAM=YX8ZU7XXF4 CODE_SIGN_STYLE=Automatic \
+  -allowProvisioningUpdates build
+DEVELOPER_DIR=/Users/kanika/Downloads/Xcode.app/Contents/Developer xcrun devicectl device install app \
+  --device F6C55681-B06F-5583-A7D3-CB0D887F7B56 \
+  /tmp/BiteLogProductionDerived/Build/Products/Debug-iphoneos/BiteLog.app
+```
+
+### Exact test steps
+
+1. Turn off Wi-Fi on the iPhone so the phone uses cellular data.
+2. Open build 21, photograph a meal, tap Estimate from photo, and confirm structured results appear.
+3. Record a spoken meal and confirm its transcript, calories, and protein appear and save correctly.
+4. Open Plan, upload `Kanika Pandey V8.pdf`, and confirm daily and weekly allowances appear.
+5. Record a Journal reflection and confirm it appears only in This week's notes.
+6. Build the weekly update and confirm the meal, movement, plan, and Journal sections are included.
+
+### Known issues and next recommended task
+
+- The public API currently has input limits and provider error handling but no App Attest enforcement or durable rate limiting; add abuse controls after the first controlled launch.
+- App records remain local to one installation and are deleted when the app is removed.
+- The GitHub remote is empty and the command-line push failed because GitHub credentials are not configured on this laptop. Local history is intact; authenticate GitHub and push `main` before switching laptops.
+- App Store submission still needs a public privacy policy/support website, App Privacy answers, privacy manifest review, screenshots, and App Store Connect metadata.
+- Next: complete the cellular-data device test, then build the public website/privacy pages and prepare the App Store archive.
