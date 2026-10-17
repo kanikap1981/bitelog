@@ -13,6 +13,7 @@
 		A10000000000000000000005 /* index.html in Resources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000007 /* index.html */; };
 		A10000000000000000000006 /* manifest.json in Resources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000009 /* manifest.json */; };
 		A10000000000000000000007 /* sw.js in Resources */ = {isa = PBXBuildFile; fileRef = A2000000000000000000000A /* sw.js */; };
+		A10000000000000000000008 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A2000000000000000000000B /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -26,6 +27,7 @@
 		A20000000000000000000008 /* BiteLog.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BiteLog.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A20000000000000000000009 /* manifest.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = manifest.json; sourceTree = "<group>"; };
 		A2000000000000000000000A /* sw.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = sw.js; sourceTree = "<group>"; };
+		A2000000000000000000000B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -55,6 +57,7 @@
 				A20000000000000000000004 /* HealthKitManager.swift */,
 				A20000000000000000000005 /* Info.plist */,
 				A20000000000000000000006 /* BiteLog.entitlements */,
+				A2000000000000000000000B /* Assets.xcassets */,
 				A40000000000000000000003 /* Resources */,
 			);
 			path = BiteLog;
@@ -130,6 +133,7 @@
 				A10000000000000000000005 /* index.html in Resources */,
 				A10000000000000000000006 /* manifest.json in Resources */,
 				A10000000000000000000007 /* sw.js in Resources */,
+				A10000000000000000000008 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -187,6 +191,7 @@
 		AA0000000000000000000003 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = BiteLog/BiteLog.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -207,6 +212,7 @@
 		AA0000000000000000000004 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = BiteLog/BiteLog.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;

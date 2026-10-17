@@ -240,3 +240,50 @@ DEVELOPER_DIR=/Users/kanika/Downloads/Xcode.app/Contents/Developer xcrun devicec
 - Final logo spacing and scale need visual confirmation on the physical phone.
 - Real meal-photo latency and nutrition accuracy still need a device check; the measured 3.10 seconds used a synthetic image.
 - Next: confirm the logo and photo estimation together on build 12 before making another design or quality tradeoff.
+
+
+## October 17, 2026 — iPhone Home Screen icon (1.5.4 build 13)
+
+### Completed
+
+- Added the missing iOS asset catalog and a production-sized 1024×1024 BiteLog app icon.
+- The icon uses the chosen identity: dark green background, large ivory `B`, and smaller `log`.
+- Configured both Debug and Release targets to compile `AppIcon`.
+- Built, signed, and installed BiteLog 1.5.4 build 13 on the connected iPhone 17 Pro.
+- Current branch: `main`.
+
+### Files changed
+
+- `ios/BiteLog/Assets.xcassets/Contents.json`
+- `ios/BiteLog/Assets.xcassets/AppIcon.appiconset/Contents.json`
+- `ios/BiteLog/Assets.xcassets/AppIcon.appiconset/BiteLog-AppIcon-1024.png`
+- `ios/BiteLogHealth.xcodeproj/project.pbxproj`
+- `ios/BiteLog/Info.plist`
+- `ios/BiteLog/Resources/index.html`
+- `docs/CURRENT_STATE.md` and `docs/HANDOFF.md`
+
+### Exact run commands
+
+```bash
+cd /Users/kanika/Documents/Healthapp/BiteLog-v1.2-production
+/Users/kanika/Downloads/Xcode.app/Contents/Developer/usr/bin/xcodebuild \
+  -project ios/BiteLogHealth.xcodeproj -scheme BiteLog -configuration Debug \
+  -destination generic/platform=iOS -derivedDataPath /tmp/BiteLogIconDerived \
+  DEVELOPMENT_TEAM=YX8ZU7XXF4 CODE_SIGN_STYLE=Automatic \
+  -allowProvisioningUpdates build
+DEVELOPER_DIR=/Users/kanika/Downloads/Xcode.app/Contents/Developer xcrun devicectl device install app \
+  --device F6C55681-B06F-5583-A7D3-CB0D887F7B56 \
+  /tmp/BiteLogIconDerived/Build/Products/Debug-iphoneos/BiteLog.app
+```
+
+### Exact test steps
+
+1. Return to the iPhone Home Screen or App Library.
+2. Confirm BiteLog shows the green `B log` icon instead of Apple's placeholder grid.
+3. Open the app and confirm Settings shows `BiteLog 1.5.4 · build 13`.
+
+### Known issues and next recommended task
+
+- iOS may briefly retain the old icon in SpringBoard cache immediately after installation; leave and return to the Home Screen if needed.
+- Visual approval of the icon at actual Home Screen size remains manual.
+- Next: confirm the Home Screen icon on build 13, then test real-meal photo latency.

@@ -133,3 +133,10 @@ The selected folder is now the local Git checkout on branch `main`, with `origin
 
 - The Today header now uses the selected BiteLog wordmark with a large capital `B`, smaller `log`, and the existing dark green accent dot.
 - Build 12 compiled, signed, and installed successfully on the connected iPhone. Physical-device visual confirmation remains manual.
+
+
+## October 17, 2026 — iPhone app icon (1.5.4 build 13)
+
+- The iOS target now has an `AppIcon` asset catalog with a 1024×1024 opaque BiteLog icon and target build settings for Debug and Release.
+- Xcode compiled the icon into `AppIcon60x60@2x.png` and `Assets.car`; build 13 was signed and installed successfully on the connected iPhone.
+- The icon is dark green with a large ivory `B` and smaller `log`, matching the in-app identity.
