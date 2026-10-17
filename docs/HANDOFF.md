@@ -388,3 +388,52 @@ DEVELOPER_DIR=/Users/kanika/Downloads/Xcode.app/Contents/Developer xcrun devicec
 - Final type scale, spacing, and color approval remain a manual physical-device review.
 - The native email draft still depends on a configured email app.
 - Next: visually review build 16 on the phone, then test the complete weekly email with real logged meals and Journal notes.
+
+
+## October 17, 2026 — compact Today redesign (1.5.8 build 17)
+
+### Completed
+
+- Rebuilt the Today header as one compact row: BiteLog identity on the left, Today and its date centered, and settings on the right.
+- Consolidated calories, protein, and remaining calories into one calm Daily nutrition card.
+- Reduced nutrition value sizes and visual weight while retaining live values and progress bars.
+- Tightened the Meals today and Activity section hierarchy.
+- Built, signed, and installed BiteLog 1.5.8 build 17 on the connected iPhone 17 Pro.
+- Current branch: `main`.
+
+### Files changed
+
+- `ios/BiteLog/Resources/index.html`
+- `ios/BiteLog/Info.plist`
+- `docs/CURRENT_STATE.md` and `docs/HANDOFF.md`
+
+### Exact run commands
+
+```bash
+cd /Users/kanika/Documents/Healthapp/BiteLog-v1.2-production
+node ios/tests/photo-analysis.test.cjs
+plutil -lint ios/BiteLog/Info.plist
+git diff --check
+/Users/kanika/Downloads/Xcode.app/Contents/Developer/usr/bin/xcodebuild \
+  -project ios/BiteLogHealth.xcodeproj -scheme BiteLog -configuration Debug \
+  -destination generic/platform=iOS -derivedDataPath /tmp/BiteLogHomeDerived \
+  DEVELOPMENT_TEAM=YX8ZU7XXF4 CODE_SIGN_STYLE=Automatic \
+  -allowProvisioningUpdates build
+DEVELOPER_DIR=/Users/kanika/Downloads/Xcode.app/Contents/Developer xcrun devicectl device install app \
+  --device F6C55681-B06F-5583-A7D3-CB0D887F7B56 \
+  /tmp/BiteLogHomeDerived/Build/Products/Debug-iphoneos/BiteLog.app
+```
+
+### Exact test steps
+
+1. Open build 17 manually and select Today.
+2. Confirm BiteLog, Today/date, and settings share one header row without overlap.
+3. Confirm Daily nutrition contains remaining calories, calories, protein, and both progress bars in one card.
+4. Log or delete a meal and confirm the calorie/protein values and bars update.
+5. Open Meals today and Activity and confirm their headings and controls remain usable.
+
+### Known issues and next recommended task
+
+- Final spacing and type approval remains a manual physical-device review.
+- Apple Health still needs a full physical-device permission and data validation pass.
+- Next: review the Today screen on the iPhone and refine only the specific elements that still feel visually heavy or misaligned.

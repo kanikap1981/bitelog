@@ -156,3 +156,10 @@ The selected folder is now the local Git checkout on branch `main`, with `origin
 - Journal, Plan, and weekly-update actions now share the green outlined visual treatment introduced by the Plan chooser.
 - Weekly Progress uses a composed seven-day overview, green section accents, refined averages with units, a meal-count pill, and green consistency indicators.
 - Build 16 passed the JavaScript behavior/syntax test, plist validation, diff validation, signed device build, and physical-device installation.
+
+
+## October 17, 2026 — compact Today screen (1.5.8 build 17)
+
+- Today now has one compact header row with the BiteLog identity, centered day/date, and settings.
+- Daily calories, protein, remaining calories, and progress bars now live in one restrained nutrition card with smaller values.
+- The JavaScript behavior/syntax test, plist validation, diff validation, signed device build, and physical-device installation pass.
