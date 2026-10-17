@@ -13,13 +13,20 @@ from app.schemas import (
     InlineMealAnalysisRequest,
     MealEstimate,
     ObjectMealAnalysisRequest,
+    PlanAnalysisRequest,
+    PlanEstimate,
     PresignRequest,
     PresignResponse,
+    VoiceMealAnalysisRequest,
+    VoiceMealEstimate,
+    VoiceTranscription,
 )
 from app.services.openai_meal_analyzer import MealAnalysisError, analyze_meal
+from app.services.openai_plan_analyzer import analyze_plan
+from app.services.openai_voice_meal_analyzer import analyze_voice_meal, transcribe_audio
 from app.services.storage import presign_upload
 
-app = FastAPI(title="BiteLog API", version="1.2.0")
+app = FastAPI(title="BiteLog API", version="1.5.0")
 logger = logging.getLogger("uvicorn.error")
 app.add_middleware(
     CORSMiddleware,
@@ -50,7 +57,7 @@ async def meal_analysis_error_handler(_: Request, exc: MealAnalysisError):
 
 @app.get("/health")
 async def health():
-    return {"status": "ok", "service": "bitelog-api", "version": "1.2.0"}
+    return {"status": "ok", "service": "bitelog-api", "version": "1.5.0"}
 
 
 def _validate_inline_image(data_url: str, settings: Settings) -> None:
@@ -67,6 +74,30 @@ def _validate_inline_image(data_url: str, settings: Settings) -> None:
         raise HTTPException(status_code=413, detail="Image is too large for inline analysis")
     if not raw:
         raise HTTPException(status_code=400, detail="The photo is empty. Choose another photo.")
+
+
+def _decode_inline_audio(data_url: str) -> tuple[bytes, str, str]:
+    match = re.match(
+        r"^data:audio/(webm|mp4|m4a|mpeg|mp3|wav|x-wav|ogg|aac);base64,(.+)$",
+        data_url,
+        flags=re.I | re.S,
+    )
+    if not match:
+        raise HTTPException(status_code=400, detail="Expected a WebM, MP4, M4A, MP3, WAV, OGG, or AAC recording")
+    encoded = match.group(2)
+    if len(encoded) > 4 * ((10_000_000 + 2) // 3):
+        raise HTTPException(status_code=413, detail="Voice recording is too large. Keep it under 30 seconds.")
+    try:
+        raw = base64.b64decode(encoded, validate=True)
+    except Exception as exc:
+        raise HTTPException(status_code=400, detail="Invalid voice recording") from exc
+    if not raw:
+        raise HTTPException(status_code=400, detail="The voice recording is empty. Please try again.")
+    if len(raw) > 10_000_000:
+        raise HTTPException(status_code=413, detail="Voice recording is too large. Keep it under 30 seconds.")
+    subtype = match.group(1).lower()
+    extension = {"mpeg": "mp3", "x-wav": "wav"}.get(subtype, subtype)
+    return raw, f"audio/{subtype}", extension
 
 
 @app.post("/v1/meals/analyze-inline", response_model=MealEstimate)
@@ -88,6 +119,35 @@ async def analyze_object(
     settings: Settings = Depends(get_settings),
 ):
     return await analyze_meal(str(body.image_url), settings)
+
+
+@app.post("/v1/meals/analyze-voice", response_model=VoiceMealEstimate)
+async def analyze_voice(
+    body: VoiceMealAnalysisRequest,
+    settings: Settings = Depends(get_settings),
+):
+    """Transcribe a short meal note and estimate nutrition server-side."""
+    audio, content_type, extension = _decode_inline_audio(body.audio_data_url)
+    return await analyze_voice_meal(audio, content_type, extension, settings)
+
+
+@app.post("/v1/voice/transcribe", response_model=VoiceTranscription)
+async def transcribe_voice(
+    body: VoiceMealAnalysisRequest,
+    settings: Settings = Depends(get_settings),
+):
+    """Transcribe a journal reflection without treating it as food."""
+    audio, content_type, extension = _decode_inline_audio(body.audio_data_url)
+    return VoiceTranscription(transcript=await transcribe_audio(audio, content_type, extension, settings))
+
+
+@app.post("/v1/plans/analyze", response_model=PlanEstimate)
+async def analyze_baseline_plan(
+    body: PlanAnalysisRequest,
+    settings: Settings = Depends(get_settings),
+):
+    """Extract daily and weekly nutrition targets while keeping the API key server-side."""
+    return await analyze_plan(body, settings)
 
 
 @app.post("/v1/uploads/presign", response_model=PresignResponse)

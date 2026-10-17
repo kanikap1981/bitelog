@@ -1,103 +1,124 @@
-# BiteLog handoff — September 20, 2026
+# BiteLog handoff — October 17, 2026
 
-## Current branch and repository status
+## Repository
 
-Branch: `main`.
-Selected project: `/Users/kanika/Documents/Healthapp/BiteLog-v1.2-production`.
-Remote: `https://github.com/kanikap1981/bitelog.git`. The remote was reachable but empty: it had no branches, refs, or commits, so there was nothing to pull and no ahead/behind comparison to perform. This folder was initialized as the first `main` checkout. Push has not been authorized and has not been performed.
-
-Proposed commit message: `Make meal and settings save dismissal persistent on iPhone`
-
-The initial local commit establishes the repository source of truth. Push it only after explicit user authorization. On another laptop, clone the remote, then follow the session-start workflow in `AGENTS.md`.
+- Project: `/Users/kanika/Documents/Healthapp/BiteLog-v1.2-production`
+- Branch: `main`
+- Remote: `https://github.com/kanikap1981/bitelog.git`
+- Remote state at session start: reachable and empty, with no refs to pull.
+- Push authorization: not granted. Commit locally and stop before push.
+- Proposed commit: `Complete BiteLog meal, journal, and nutrition plan MVP`
 
 ## Completed
 
-Read AGENTS, CURRENT_STATE, NEXT_TASKS, and the Notion product vision. HANDOFF did not exist at task start. Inspected the backend, bundled iOS JavaScript, Swift WebView bridge, Info.plist, and Python runtime before editing.
+BiteLog 1.5.0 build 9 now supports the intended local MVP workflow:
 
-Preserved the existing POST `/v1/meals/analyze-inline` request `{image_data_url}` and response `{name, calories, protein, confidence, description, assumptions}`. Kept AI calls and keys server-side, existing `gpt-5.6-luna`, dependency pins, signing, native HealthKit, and Swift shell.
+1. Settings stores the athlete's name, dietitian's name/email, fallback targets, and local API URL; Save closes the sheet.
+2. Manual, photo, and spoken meal logs save to the selected day. The Today screen immediately shows today's saved meal, and Food Log shows the ongoing history.
+3. Every meal can be deleted directly; totals and all affected views update immediately.
+4. Photo analysis remains server-side and returns meal name, calories, protein, confidence, description, and assumptions.
+5. Spoken meals are transcribed and estimated server-side. Failed or unclear voice recordings are not stored.
+6. Journal voice notes are transcribed into reflections. They are kept separate from food and included in the weekly dietitian update.
+7. The Plan flow saves the original PDF/image/text locally before analysis, reopens it from the Plan screen, and extracts goal, meal windows/options, hydration, weekly rules, recipes, ranges, summary, and assumptions.
+8. Plans with explicit totals preserve them. Plans without totals receive clearly labeled estimated daily/weekly calorie and protein ranges.
+9. Progress and the weekly email use the last seven local calendar days and compare logged nutrition with the active plan allowance. The app opens a pre-addressed mail draft and does not send automatically.
 
-Fixed duplicated endpoint paths after legacy configuration migration; added URL/response validation, photo decode errors, 60-second client deadline, server timeout/network/provider errors, stale-response cancellation, clear retry/manual-entry messaging, request IDs, and a Settings health check. Preserved fractional protein. Added backend and UI regression tests. Recorded the required multi-device workflow in AGENTS.md and product decisions in repository documents.
+The real five-page `Kanika Pandey V8.pdf` was saved, reopened, and analyzed through the browser UI against the live FastAPI route. Its meal schedule, 2–3 L hydration guidance, weekly rules, and four recipes were preserved. Because that document does not state calories or protein totals, the generated allowances are labeled as estimates.
 
-After physical-device feedback, fixed a shared WKWebView dialog issue: meal and Settings values persisted, but their sheets stayed open after Save. Direct `dialog.close()` calls were replaced with shared helpers that explicitly remove the dialog's `open` state and force immediate dismissal. The fixed bundle built, installed, and launched on Kanika's iPhone.
+## Files changed
 
-After a second physical-device report, strengthened that fallback so the closed dialog remains `display: none !important` until the next explicit open. Save meal now switches to Today before rendering, where the new meal card and a clearer `Delete` action are visible. Settings Save uses the same persistent dismissal. Version `1.2.1` build `3` is displayed in Settings so testers can distinguish this bundle from older installs. Xcode installed and launched build 3 on Kanika's iPhone and reported `Running BiteLog on Kanika’s iPhone`.
+- `backend/app/main.py` — version 1.5.0 and plan/voice routes.
+- `backend/app/schemas.py` — structured voice, plan, range, schedule, and transcription contracts.
+- `backend/app/services/openai_plan_analyzer.py` — plan file validation and structured server-side extraction.
+- `backend/app/services/openai_voice_meal_analyzer.py` — transcription plus structured spoken-meal estimates.
+- `backend/tests/test_plan_analysis.py` — plan route, schema, and invalid-file tests.
+- `backend/tests/test_voice_analysis.py` — spoken meal, unclear note, and journal transcription tests.
+- `ios/BiteLog/Info.plist` — 1.5.0 build 9.
+- `ios/BiteLog/Resources/index.html` — separate Food Log/Journal flows, meal deletion, voice logging, plan storage/viewer/extraction, configurable profile, weekly progress/email, and local-date handling.
+- `ios/tests/photo-analysis.test.cjs` — complete behavior/syntax regression checks.
+- `docs/CURRENT_STATE.md`, `docs/HANDOFF.md`, and `docs/NEXT_TASKS.md` — durable project state and next work.
 
-## Changed files
+## Validation
 
-- `AGENTS.md` — multi-device workflow and product context.
-- `backend/app/main.py` — image size checks, request IDs/logging, error status handling.
-- `backend/app/schemas.py` — reject blank meal names; assumptions list factory.
-- `backend/app/services/openai_meal_analyzer.py` — bounded provider calls, safe errors, refusal/incomplete response handling, `store: false`.
-- `backend/tests/test_photo_analysis.py` — seven route/provider regression tests with a valid synthetic PNG.
-- `backend/README.md` — troubleshooting/test guide link.
-- `ios/BiteLog/Resources/index.html` — URL migration, robust photo estimation and connection diagnostics.
-- `ios/BiteLog/Info.plist` — device-test version `1.2.1`, build `3`.
-- `ios/tests/photo-analysis.test.cjs` — actual bundled handler tests with controlled DOM/network.
-- `docs/PHOTO_ANALYSIS.md` — full contract, startup, device checks and evidence limits.
-- `docs/CURRENT_STATE.md` — updated evidence and repository blocker.
-- `docs/HANDOFF.md` — this handoff.
+- `node ios/tests/photo-analysis.test.cjs`: pass.
+- `PYTHONDONTWRITEBYTECODE=1 ... -m unittest discover -s tests -v`: 14 tests pass.
+- `git diff --check`: pass.
+- `plutil -lint ios/BiteLog/Info.plist`: pass.
+- Secret scan of tracked source: no OpenAI key pattern found.
+- Real sample PDF request to `POST /v1/plans/analyze`: HTTP 200 with complete structured extraction.
+- Browser UI: original document saved, View original opened it, analysis completed, and extracted content rendered.
+- Xcode generic iOS device build: succeeded and signed with the existing Apple Development identity and HealthKit entitlement.
 
-## Validation and known issues
+## Known issues
 
-Seven backend test cases pass on the existing Python 3.9.6 virtualenv without dependency changes. JavaScript handler checks pass for URL migration, request shape, successful population, malformed response, server/network errors, timeout and cancellation; full app script parses. CORS from a file-origin WebView is covered at the API layer. Source scan found zero potential embedded OpenAI keys.
+- The iPhone was connected but locked when build 9 was ready, so iOS rejected the developer-image mount and the final app was not installed. Unlock it, then use the install command below.
+- Apple Health authorization, steps, active energy, and workout minutes still need validation on the physical iPhone.
+- Data is local-only in localStorage/IndexedDB. Uninstalling BiteLog removes its meals, journal, profile, and saved plan.
+- Numeric estimates can vary between analyses when the source plan has no explicit totals. They are guidance inferred from portions and remain visibly labeled as estimates.
+- Local HTTP, broad CORS, and an unauthenticated API are development-only.
 
-Live provider smoke test through the actual FastAPI route returned HTTP 200 with all six fields using `gpt-5.6-luna` and the existing sibling backend's server configuration. This used a 64×64 synthetic PNG, not a meal: it proves credentials/connectivity and schema compatibility, not nutrition accuracy. An earlier one-pixel image had a bad CRC and was rejected; the automated fixture was corrected. Requests required network permission outside the sandbox.
+## Run the backend on this laptop
 
-The updated checkout built, installed, and launched successfully through Xcode on `Kanika's iPhone`; Xcode reported `Running BiteLog on Kanika's iPhone`. The backend was started from this checkout with the existing sibling Python 3.9 environment and server `.env`, and both `http://127.0.0.1:8000/health` and `http://10.0.0.214:8000/health` returned HTTP 200. The iPhone initially had to be unlocked before Xcode could launch the app.
-
-Physical-iPhone backend logs now show three successful `/health` calls and two successful `POST /v1/meals/analyze-inline` calls from `10.0.0.217`; both analysis calls returned HTTP 200. This proves the in-app LAN and AI request path. Final Save-sheet interaction and nutrition accuracy remain unverified because the iPhone screen is not remotely controllable from this Mac. Full Xcode is installed at `/Users/kanika/Downloads/Xcode.app`, while shell `xcrun` still resolves to Command Line Tools unless `DEVELOPER_DIR` is set. Apple Health remains unvalidated and unchanged. Local HTTP, broad CORS, lack of API authentication/rate limits, and production-only API configuration are existing separate hardening tasks. The remote contained no prior Git history to audit.
-
-The latest UI regression test passes with native dialog closing deliberately simulated as a no-op. It verifies that Save meal persists the complete meal, explicitly selects Today, renders the meal list, and keeps the sheet hidden; reopening removes the forced hidden style. Save Settings persists targets/API URL, renders, and keeps its sheet hidden. Seven backend tests also pass. Build `1.2.1 (3)` is installed and running on the physical device, but a final tap-through confirmation is pending.
-
-## Exact run commands
-
-On this laptop, the existing Python 3.9 environment and server `.env` are in the sibling `BiteLogproduction` folder. Run this selected project's code with that environment explicitly; do not accidentally start the old sibling code:
-
-```bash
-cd /Users/kanika/Documents/Healthapp/BiteLog-v1.2-production/backend
-source /Users/kanika/Documents/Healthapp/BiteLogproduction/backend/.venv/bin/activate
-python -m uvicorn app.main:app --env-file /Users/kanika/Documents/Healthapp/BiteLogproduction/backend/.env --reload --host 0.0.0.0 --port 8000
-```
-
-On another laptop, from the actual synced repository root:
-
-```bash
-cd backend
-python3 -m venv .venv
-source .venv/bin/activate
-python -m pip install -r requirements.txt
-```
-
-Create `.env` from `.env.example` only when no `.env` exists; configure the real server key locally. Never commit `.env`. Then:
-
-```bash
-python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
-```
-
-## Exact test steps
-
-In another terminal on this laptop:
+The compatible Python 3.9 virtual environment and `.env` are in the sibling project. Run this checkout's code explicitly:
 
 ```bash
 cd /Users/kanika/Documents/Healthapp/BiteLog-v1.2-production/backend
 source /Users/kanika/Documents/Healthapp/BiteLogproduction/backend/.venv/bin/activate
-PYTHONDONTWRITEBYTECODE=1 python -m unittest discover -s tests -v
-node ../ios/tests/photo-analysis.test.cjs
-curl http://127.0.0.1:8000/health
+python -m uvicorn app.main:app \
+  --env-file /Users/kanika/Documents/Healthapp/BiteLogproduction/backend/.env \
+  --reload --host 0.0.0.0 --port 8000
+```
+
+Find the Mac's Wi-Fi IP:
+
+```bash
 ipconfig getifaddr en0
 ```
 
-1. Open the selected project's `ios/BiteLogHealth.xcodeproj` in full Xcode, choose the existing signing team and iPhone, build and install.
-2. Open Settings and confirm the footer says `BiteLog 1.2.1 · build 3`. If it does not, rebuild from this checkout before evaluating the fix.
-3. Put Mac and iPhone on the same Wi-Fi. In iPhone Safari open `http://<MAC-IP>:8000/health`; confirm `status: ok`.
-4. In BiteLog Settings enter `http://<MAC-IP>:8000`, tap Check API connection, then Save. Confirm Settings closes. Allow Local Network access if needed.
-5. Add a meal manually or from a real photo. For a photo, tap Estimate from photo and check the name, calories, decimal protein, confidence and assumptions. Edit if needed, then tap Save meal.
-6. Confirm the meal sheet closes, the app shows Today, and the new meal card is visible with matching calories and protein.
-7. Tap `Delete` on that meal, confirm deletion, and verify the card and its contribution to daily totals disappear.
-8. Stop the backend and repeat photo estimation: expect a readable connectivity error and usable manual entry. Restart and retry.
-9. Start an estimate, cancel and open a new meal; verify the old request cannot fill the new form.
-10. Record actual device and meal-photo results in CURRENT_STATE/HANDOFF before the next commit.
+## Test commands
+
+```bash
+cd /Users/kanika/Documents/Healthapp/BiteLog-v1.2-production
+node ios/tests/photo-analysis.test.cjs
+cd backend
+PYTHONDONTWRITEBYTECODE=1 /Users/kanika/Documents/Healthapp/BiteLogproduction/backend/.venv/bin/python -m unittest discover -s tests -v
+curl http://127.0.0.1:8000/health
+```
+
+Build the signed iPhone app:
+
+```bash
+cd /Users/kanika/Documents/Healthapp/BiteLog-v1.2-production
+/Users/kanika/Downloads/Xcode.app/Contents/Developer/usr/bin/xcodebuild \
+  -project ios/BiteLogHealth.xcodeproj -scheme BiteLog -configuration Debug \
+  -destination generic/platform=iOS -derivedDataPath /tmp/BiteLogDerived \
+  DEVELOPMENT_TEAM=YX8ZU7XXF4 CODE_SIGN_STYLE=Automatic \
+  -allowProvisioningUpdates build
+```
+
+After connecting and unlocking Kanika's iPhone, list devices and install using the current CoreDevice identifier:
+
+```bash
+DEVELOPER_DIR=/Users/kanika/Downloads/Xcode.app/Contents/Developer xcrun devicectl list devices
+DEVELOPER_DIR=/Users/kanika/Downloads/Xcode.app/Contents/Developer xcrun devicectl device install app \
+  --device <COREDEVICE-ID> \
+  /tmp/BiteLogDerived/Build/Products/Debug-iphoneos/BiteLog.app
+```
+
+## Exact iPhone test steps
+
+1. Connect and unlock the iPhone, install build 9, open BiteLog, and confirm Settings shows `BiteLog 1.5.0 · build 9`.
+2. Keep Mac and iPhone on the same Wi-Fi. Open `http://<MAC-IP>:8000/health` in iPhone Safari and expect `status: ok`.
+3. In BiteLog Settings enter athlete name, dietitian name/email, and `http://<MAC-IP>:8000`; check the connection, tap Save, and confirm the sheet closes.
+4. Add a manual meal and save. Confirm the sheet closes, Today shows the meal, and Food Log shows it.
+5. Photograph a real meal, review the structured estimate, save, and confirm it appears in both locations.
+6. Record a spoken food log. Confirm it creates a meal with a transcript and nutrition. Record an unclear/non-food note and confirm nothing is stored.
+7. Delete each test meal from Food Log and confirm cards and totals update.
+8. Record a Journal voice note about hunger, energy, training, or digestion. Confirm it appears only in Journal.
+9. Upload `Kanika Pandey V8.pdf`. Confirm the original is saved and View original opens it; analyze it and check meal windows, hydration, weekly rules, recipes, and the estimated-range badge.
+10. Open Progress, build the weekly update, and confirm it includes seven-day nutrition, Apple Health snapshot, plan summary, and Journal reflections. Add the dietitian's email before tapping Email; review the mail draft without sending during testing.
+11. Trigger Apple Health sync, approve permissions, and compare steps/active calories/workout minutes with the Health app.
 
 ## Next recommended task
 
-On the running physical iPhone, confirm the Settings footer is `BiteLog 1.2.1 · build 3`, then complete the Save meal, Today card, Delete, and Settings Save tap-through above. If that passes, validate nutrition accuracy with a real meal photo while watching the backend request log and record the result here. After that, move to native HealthKit authorization/steps/activity validation. Push the local commits only after explicit authorization.
+Install build 9 and complete the physical-iPhone test steps above, with Apple Health as the first unresolved integration. After device validation, add account-backed server persistence so plans, meals, and journal entries survive reinstall and sync across devices.

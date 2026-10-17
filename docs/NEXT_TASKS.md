@@ -1,35 +1,34 @@
 # Next tasks
 
-## P0 — connectivity and photo analysis
-- Add an in-app dev diagnostics panel showing API base URL, `/health` status, and last request error.
-- Verify iPhone can load `/health` on the LAN.
-- Verify request payload shape for `/v1/meals/analyze-inline`.
-- Verify provider model name and Responses API request schema against current official docs.
-- Add backend request IDs and concise structured logging.
-- Add backend test fixture for a tiny image data URL without calling the external provider.
+## P0 — physical iPhone validation
+
+- Install BiteLog 1.5.0 build 9 on the connected, unlocked iPhone.
+- Complete manual/photo/voice save, Food Log display, and deletion checks.
+- Upload and reopen the sample PDF in the iPhone app; verify extracted plan sections and estimate labeling.
+- Validate the weekly email draft without sending it.
 
 ## P0 — Apple Health
-- Verify HealthKit authorization request is triggered by UI action.
-- Log authorization callback errors to Xcode console and surface a user-friendly status.
-- Confirm HealthKit read types and entitlements match.
-- Test steps and active energy first; add heart rate/workouts after basics work.
 
-## P1 — UX cleanup
-- Rename “Meal analysis endpoint” to “BiteLog API URL” in dev builds.
-- Hide API configuration from production UX.
-- Add photo-analysis loading/progress/error states.
-- Make Today screen clearer around calories remaining, protein target, and activity.
+- Trigger HealthKit authorization from the physical app.
+- Verify steps, active energy, and workout minutes against Apple Health.
+- Surface authorization or data-read failures clearly in the app.
 
-## P1 — persistence
-- Add user model + Sign in with Apple.
-- Save confirmed meals to Postgres.
-- Add direct object-storage upload via presigned URL.
-- Store AI estimate separately from user-confirmed nutrition values.
+## P1 — durable persistence
 
-## P2 — production hardening
-- HTTPS-only backend deployment.
-- Authenticated API requests.
-- Rate limiting and abuse protection.
-- Remove broad CORS policy.
-- Background jobs for heavier processing.
-- Observability and error monitoring.
+- Add a user model and Sign in with Apple.
+- Store confirmed meals, journal entries, profile data, and extracted plans in a backend database.
+- Store original plan files in private object storage and support retrieval across devices.
+- Keep AI estimates distinct from athlete-confirmed values.
+
+## P1 — plan accuracy
+
+- Add an explicit user choice for plans without numeric targets: rules-only or estimated ranges.
+- Preserve version history when a dietitian sends a revised plan.
+- Add a review/edit step before extracted targets become active.
+
+## P2 — production deployment
+
+- Deploy the backend behind HTTPS.
+- Authenticate API requests, restrict CORS, and add rate limits.
+- Move the API URL out of the production Settings experience.
+- Add observability and privacy-safe error monitoring.
