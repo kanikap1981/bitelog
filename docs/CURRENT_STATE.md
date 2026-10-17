@@ -178,3 +178,9 @@ The selected folder is now the local Git checkout on branch `main`, with `origin
 - Journal and Plan use illustrated purpose cards instead of repeated page-name headings, while Progress opens directly on the seven-day overview.
 - This week's notes now uses the approved soft-green overview treatment.
 - The JavaScript behavior/syntax test, plist validation, diff validation, signed device build, and physical-device installation pass.
+
+
+## October 17, 2026 — lighter weekly reflections (1.6.1 build 20)
+
+- Redundant Journal guidance is removed. Saved reflections now use regular sentence text in spacious light tiles inside the soft-green notes card.
+- The JavaScript behavior/syntax test, plist validation, diff validation, signed device build, and physical-device installation pass.

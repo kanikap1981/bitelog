@@ -537,3 +537,51 @@ DEVELOPER_DIR=/Users/kanika/Downloads/Xcode.app/Contents/Developer xcrun devicec
 - Final illustration scale, copy, and spacing approval remains a manual physical-device review.
 - Apple Health still needs a complete physical-device permission and data validation pass.
 - Next: review build 19 visually and refine only specific rejected elements.
+
+
+## October 17, 2026 — lighter weekly reflections (1.6.1 build 20)
+
+### Completed
+
+- Removed the redundant long Journal guidance paragraph below the illustrated introduction.
+- Redesigned saved weekly reflections as separate light tiles inside the soft-green notes card.
+- Changed reflection text from bold heading type to regular sentence text with more line spacing.
+- Added a compact reflection count and quieter timestamp/delete treatments.
+- Built, signed, and installed BiteLog 1.6.1 build 20 on the connected iPhone 17 Pro.
+- Current branch: `main`.
+
+### Files changed
+
+- `ios/BiteLog/Resources/index.html`
+- `ios/BiteLog/Info.plist`
+- `docs/CURRENT_STATE.md` and `docs/HANDOFF.md`
+
+### Exact run commands
+
+```bash
+cd /Users/kanika/Documents/Healthapp/BiteLog-v1.2-production
+node ios/tests/photo-analysis.test.cjs
+plutil -lint ios/BiteLog/Info.plist
+git diff --check
+/Users/kanika/Downloads/Xcode.app/Contents/Developer/usr/bin/xcodebuild \
+  -project ios/BiteLogHealth.xcodeproj -scheme BiteLog -configuration Debug \
+  -destination generic/platform=iOS -derivedDataPath /tmp/BiteLogNotesDerived \
+  DEVELOPMENT_TEAM=YX8ZU7XXF4 CODE_SIGN_STYLE=Automatic \
+  -allowProvisioningUpdates build
+DEVELOPER_DIR=/Users/kanika/Downloads/Xcode.app/Contents/Developer xcrun devicectl device install app \
+  --device F6C55681-B06F-5583-A7D3-CB0D887F7B56 \
+  /tmp/BiteLogNotesDerived/Build/Products/Debug-iphoneos/BiteLog.app
+```
+
+### Exact test steps
+
+1. Open build 20 and select Journal.
+2. Confirm the long hunger/energy guidance paragraph no longer appears.
+3. Confirm each saved reflection uses regular-weight text inside its own light tile.
+4. Confirm the reflection count, timestamp, and Delete action remain readable and functional.
+5. Record and save a new reflection, then delete it and confirm the count updates.
+
+### Known issues and next recommended task
+
+- Final tile spacing and text-size approval remains a manual physical-device review.
+- Next: review build 20 on the iPhone, then continue only with specific rejected visual elements.
