@@ -101,3 +101,13 @@ The selected folder is now the local Git checkout on branch `main`, with `origin
 - Apple Health still needs a physical-device permission and data validation pass.
 - Meals, profile, extracted plan data, and the original plan currently live only in the app's local WebView storage. There is no user account, cloud sync, or server database yet, so deleting the app removes local data.
 - The local development backend uses HTTP, broad CORS, and no API authentication. Production deployment and hardening remain future work.
+
+
+## October 17, 2026 — restrained palette and typography (1.5.1 build 10)
+
+- The active interface now uses neutral system surfaces, charcoal text, gray metadata, and one dark green accent (`#207A55`). Red is reserved for destructive/error states.
+- Blue, orange, purple, lime, and bright green no longer compete as active interface accents. Calories and protein use the same visual language because color does not encode different health judgments.
+- The green accent passes WCAG normal-text contrast against white (5.28:1) and the light system background (4.73:1).
+- Typography now uses the iOS system sans-serif with a calmer hierarchy inspired by Spotify's content-first rhythm: one strong page title, medium section headings, regular body copy, sentence-case labels, and reduced letter compression.
+- Marketing-style headings were simplified to direct names such as “Today’s targets,” “Weekly progress,” “Your nutrition plan,” and “Add to BiteLog.”
+- Visual browser checks covered Today, Progress, and the Add sheet. The JavaScript regression test, Info.plist validation, diff check, and iPhone 17 simulator build pass.
