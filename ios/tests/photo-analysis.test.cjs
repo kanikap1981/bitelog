@@ -10,17 +10,17 @@ function $(id){return nodes[id] ||= {
  get hidden(){return this._hidden},set hidden(value){this._hidden=value;if(value)order.push('close')},
  style:{setProperty(name,value,priority){this[name]=value;this[name+'Priority']=priority},removeProperty(name){delete this[name];delete this[name+'Priority']}},
  classList:{values:new Set(),add(name){this.values.add(name)},remove(name){this.values.delete(name)},contains(name){return this.values.has(name)}},handlers:{},attributes:{},
- addEventListener(name,fn){this.handlers[name]=fn},setAttribute(name,value){this.attributes[name]=value}
+ addEventListener(name,fn){this.handlers[name]=fn},click(){return this.handlers.click?.()},scrollIntoView(){order.push('scrollIntoView')},setAttribute(name,value){this.attributes[name]=value}
 }}
 class FileReader{readAsDataURL(){this.result='data:audio/mp4;base64,dGVzdA==';this.onload()}}
-const context={$,URL,AbortController,TypeError,Blob,FileReader,console,setTimeout,clearTimeout,alert(){},window:{scrollTo(){order.push('scroll')}},photoData:'data:image/jpeg;base64,test',photoVersion:0,analysisController:null,state:{apiBaseURL:'http://192.168.1.2:8000'},fetch:null};
+const context={$,URL,AbortController,TypeError,Blob,FileReader,console,setTimeout,clearTimeout,alert(){},document:{querySelector(selector){if(selector==='meta[name=\"bitelog-api-base\"]')return{content:'http://192.168.1.2:8000'};return $(selector)}},window:{scrollTo(){order.push('scroll')}},photoData:'data:image/jpeg;base64,test',photoVersion:0,analysisController:null,state:{apiBaseURL:'http://192.168.1.2:8000'},fetch:null};
 vm.createContext(context);
 const script=html.match(/<script>([\s\S]*?)<\/script>/)[1];
 new vm.Script(script); // Syntax-check the complete app too.
 vm.runInContext(script.slice(script.indexOf('// Use app-controlled overlays'),script.indexOf('function openMeal')),context);
 vm.runInContext(script.slice(script.indexOf('// Both old full endpoints'),script.indexOf("$('#saveMeal').addEventListener")),context);
 vm.runInContext(script.slice(script.indexOf('function saveMeal'),script.indexOf("\n$('#saveMeal')")),context);
-vm.runInContext(script.slice(script.indexOf('function saveSettings'),script.indexOf("\n$('#saveSettings')")),context);
+vm.runInContext(script.slice(script.indexOf('function validEmail'),script.indexOf("\n$('#saveSettings')")),context);
 vm.runInContext(script.slice(script.indexOf('function deleteMeal'),script.indexOf('// Use app-controlled overlays')),context);
 vm.runInContext(script.slice(script.indexOf('function blobToDataURL'),script.indexOf('async function transcribeJournalNote')),context);
 const estimate={name:'Eggs',calories:400,protein:23.5,confidence:.8,assumptions:['Two eggs']};
@@ -34,7 +34,7 @@ const click=()=>$('#estimateMeal').handlers.click();
  await click();assert.equal($('#name').value,'Eggs');assert.equal($('#protein').value,23.5);assert.match($('#aiHint').textContent,/Two eggs/);assert.match($('#estimateValues').textContent,/80%/);
  context.fetch=async()=>response({});await click();assert.match($('#aiHint').textContent,/invalid meal estimate/);assert.equal($('#name').value,'Eggs');
  context.fetch=async()=>response({detail:'Photo analysis timed out.'},504);await click();assert.match($('#aiHint').textContent,/timed out/);assert.equal($('#saveMeal').disabled,false);
- context.fetch=async()=>{throw new TypeError('Failed to fetch')};await click();assert.match($('#aiHint').textContent,/same Wi-Fi/);
+ context.fetch=async()=>{throw new TypeError('Failed to fetch')};await click();assert.match($('#aiHint').textContent,/Check Wi-Fi/);
  context.fetch=async()=>{const e=new Error();e.name='AbortError';throw e};await click();assert.match($('#aiHint').textContent,/timed out/);
  let resolve;context.fetch=()=>new Promise(r=>resolve=r);const pending=click();assert.equal($('#saveMeal').disabled,true);context.resetAnalysis();$('#name').value='New meal';resolve(response(estimate));await pending;assert.equal($('#name').value,'New meal');
  const meals=[];context.day=()=>meals;context.persist=()=>order.push('persist');context.switchTab=tab=>order.push('tab:'+tab);context.render=()=>order.push('render');
@@ -43,7 +43,7 @@ const click=()=>$('#estimateMeal').handlers.click();
  assert.equal(JSON.stringify(meals),JSON.stringify([{name:'Eggs',calories:400,protein:23.5,type:'Breakfast',time:'08:15',photo:context.photoData}]));
  assert.equal($('#mealDialog').hidden,true);assert.equal($('#mealDialog').classList.contains('open'),false);assert.equal($('#mealDialog').style.display,'none');assert.equal($('#mealDialog').style.displayPriority,'important');assert.deepEqual(order,['persist','close','tab:today','render','scroll']);
  context.openDialog($('#mealDialog'));assert.equal($('#mealDialog').hidden,false);assert.equal($('#mealDialog').classList.contains('open'),true);assert.equal($('#mealDialog').style.display,undefined);
- context.state={targetCalories:2000,targetProtein:120,profile:{},apiBaseURL:''};$('#athleteName').value='Alex';$('#dietitianName').value='Jordan';$('#dietitianEmail').value='jordan@example.com';$('#targetCalories').value='2500';$('#targetProtein').value='150';$('#apiBaseURL').value='http://192.168.1.2:8000/';$('#settingsDialog').hidden=false;$('#settingsDialog').classList.add('open');order.length=0;
+ context.state={targetCalories:2000,targetProtein:120,profile:{},apiBaseURL:'http://192.168.1.2:8000'};$('#athleteName').value='Alex';$('#dietitianName').value='Jordan';$('#dietitianEmail').value='jordan@example.com';$('#targetCalories').value='2500';$('#targetProtein').value='150';$('#settingsDialog').hidden=false;$('#settingsDialog').classList.add('open');order.length=0;
  context.saveSettings();
  assert.equal(JSON.stringify(context.state),JSON.stringify({targetCalories:2500,targetProtein:150,profile:{athleteName:'Alex',dietitianName:'Jordan',dietitianEmail:'jordan@example.com'},apiBaseURL:'http://192.168.1.2:8000'}));
  assert.equal($('#settingsDialog').hidden,true);assert.equal($('#settingsDialog').classList.contains('open'),false);assert.equal($('#settingsDialog').style.display,'none');assert.equal($('#settingsDialog').style.displayPriority,'important');assert.deepEqual(order,['persist','close','render']);
@@ -56,5 +56,6 @@ const click=()=>$('#estimateMeal').handlers.click();
  context.state.days={'2026-09-20':[...meals]};context.persist=()=>order.push('persist');context.render=()=>order.push('render');order.length=0;
  context.deleteMeal('2026-09-20',0);assert.equal(context.state.days['2026-09-20'].length,1);assert.deepEqual(order,['persist','render']);
  context.deleteMeal('2026-09-20',0);assert.equal(context.state.days['2026-09-20'],undefined);
- console.log('PASS: photo/voice analysis, direct meal deletion, meal/settings persistence, app-controlled modal dismissal, and discard-on-failure; complete app syntax');
+ assert.match(html,/function showWeeklyUpdate\(\)/);assert.doesNotMatch(html,/id=\"goWeekly\"/);assert.match(html,/Build my weekly update for the dietitian/);
+ console.log('PASS: photo/voice analysis, direct meal deletion, meal/settings persistence, single weekly update wiring, app-controlled modal dismissal, and discard-on-failure; complete app syntax');
 })().catch(err=>{console.error(err);process.exitCode=1});

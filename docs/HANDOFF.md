@@ -287,3 +287,104 @@ DEVELOPER_DIR=/Users/kanika/Downloads/Xcode.app/Contents/Developer xcrun devicec
 - iOS may briefly retain the old icon in SpringBoard cache immediately after installation; leave and return to the Home Screen if needed.
 - Visual approval of the icon at actual Home Screen size remains manual.
 - Next: confirm the Home Screen icon on build 13, then test real-meal photo latency.
+
+
+## October 17, 2026 — onboarding, Plan UX, weekly update, and email (1.5.6 build 15)
+
+### Completed
+
+- Removed the duplicate `Build weekly check-in` card. Progress now has one `Build my weekly update for the dietitian` button that generates and reveals the summary.
+- Added first-run profile onboarding for athlete name, dietitian name, and dietitian email.
+- Removed the development API URL and connection check from the user-facing profile. The current development endpoint is supplied as product configuration in the bundled page.
+- Redesigned the Plan screen around one clear PDF/photo chooser, concise guidance, optional instructions, one analysis action, and a separate saved-plan result.
+- Added native `mailto:` handling in the WKWebView wrapper. Missing profile email opens profile settings; an unavailable mail app shows a visible error.
+- Built, signed, and installed BiteLog 1.5.6 build 15 on the connected iPhone 17 Pro.
+- Current branch: `main`.
+
+### Files changed
+
+- `ios/BiteLog/Resources/index.html`
+- `ios/BiteLog/BiteLogWebView.swift`
+- `ios/BiteLog/Info.plist`
+- `ios/tests/photo-analysis.test.cjs`
+- `docs/CURRENT_STATE.md` and `docs/HANDOFF.md`
+
+### Exact run commands
+
+```bash
+cd /Users/kanika/Documents/Healthapp/BiteLog-v1.2-production
+node ios/tests/photo-analysis.test.cjs
+cd backend
+PYTHONDONTWRITEBYTECODE=1 /Users/kanika/Documents/Healthapp/BiteLogproduction/backend/.venv/bin/python -m unittest discover -s tests -v
+cd ..
+/Users/kanika/Downloads/Xcode.app/Contents/Developer/usr/bin/xcodebuild \
+  -project ios/BiteLogHealth.xcodeproj -scheme BiteLog -configuration Debug \
+  -destination generic/platform=iOS -derivedDataPath /tmp/BiteLogOnboardingDerived \
+  DEVELOPMENT_TEAM=YX8ZU7XXF4 CODE_SIGN_STYLE=Automatic \
+  -allowProvisioningUpdates build
+DEVELOPER_DIR=/Users/kanika/Downloads/Xcode.app/Contents/Developer xcrun devicectl device install app \
+  --device F6C55681-B06F-5583-A7D3-CB0D887F7B56 \
+  /tmp/BiteLogOnboardingDerived/Build/Products/Debug-iphoneos/BiteLog.app
+```
+
+### Exact test steps
+
+1. Open build 15 manually. Complete the Welcome profile prompt and confirm it closes.
+2. Open settings and confirm the saved profile is editable and no API/server field appears.
+3. Open Plan and confirm the redesigned chooser, optional instructions, and one Analyze and save plan button.
+4. Open Progress and confirm there is one weekly-update button. Tap it and confirm the summary and actions appear.
+5. Tap Email dietitian and confirm the installed mail app opens a draft addressed to the saved dietitian with the summary in the body.
+
+### Known issues and next recommended task
+
+- Opening an email draft requires a configured mail app on the phone; BiteLog shows a copy/configure message if iOS cannot open one.
+- The hidden development endpoint currently points to this Mac's LAN address. Production needs a stable HTTPS API configuration before distribution, and another laptop may require changing the bundled value.
+- Onboarding and profile data remain local to the app installation; cloud account sync is not implemented.
+- Next: manually verify the five build-15 flows above on the physical phone.
+
+
+## October 17, 2026 — polished Journal and Weekly Progress (1.5.7 build 16)
+
+### Completed
+
+- Applied the Plan chooser's green outlined action style to Journal recording, plan analysis, saved-plan viewing, and weekly-update generation.
+- Replaced the four generic Weekly Progress metric boxes with one designed weekly overview: logged-day headline, meal-count pill, and paired calorie/protein averages with units.
+- Added consistent green headings and subtle top accents to Against your plan, Consistency, and the weekly dietitian update.
+- Changed logged-day markers and email actions from repeated black styling to the restrained green system.
+- Built, signed, and installed BiteLog 1.5.7 build 16 on the connected iPhone 17 Pro.
+- Current branch: `main`.
+
+### Files changed
+
+- `ios/BiteLog/Resources/index.html`
+- `ios/BiteLog/Info.plist`
+- `docs/CURRENT_STATE.md` and `docs/HANDOFF.md`
+
+### Exact run commands
+
+```bash
+cd /Users/kanika/Documents/Healthapp/BiteLog-v1.2-production
+node ios/tests/photo-analysis.test.cjs
+/Users/kanika/Downloads/Xcode.app/Contents/Developer/usr/bin/xcodebuild \
+  -project ios/BiteLogHealth.xcodeproj -scheme BiteLog -configuration Debug \
+  -destination generic/platform=iOS -derivedDataPath /tmp/BiteLogPolishedDerived \
+  DEVELOPMENT_TEAM=YX8ZU7XXF4 CODE_SIGN_STYLE=Automatic \
+  -allowProvisioningUpdates build
+DEVELOPER_DIR=/Users/kanika/Downloads/Xcode.app/Contents/Developer xcrun devicectl device install app \
+  --device F6C55681-B06F-5583-A7D3-CB0D887F7B56 \
+  /tmp/BiteLogPolishedDerived/Build/Products/Debug-iphoneos/BiteLog.app
+```
+
+### Exact test steps
+
+1. Open build 16 and complete onboarding if it appears.
+2. Open Journal and confirm Add a reflection and Start journal note use the green visual system.
+3. Open Progress and confirm the weekly overview is one composed card rather than four plain boxes.
+4. Confirm Against your plan, Consistency, and Weekly update use green headings/indicators and no repeated black action buttons.
+5. Tap the single weekly-update button, then confirm Copy and Email dietitian appear and email opens a draft.
+
+### Known issues and next recommended task
+
+- Final type scale, spacing, and color approval remain a manual physical-device review.
+- The native email draft still depends on a configured email app.
+- Next: visually review build 16 on the phone, then test the complete weekly email with real logged meals and Journal notes.

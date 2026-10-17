@@ -140,3 +140,19 @@ The selected folder is now the local Git checkout on branch `main`, with `origin
 - The iOS target now has an `AppIcon` asset catalog with a 1024×1024 opaque BiteLog icon and target build settings for Debug and Release.
 - Xcode compiled the icon into `AppIcon60x60@2x.png` and `Assets.car`; build 13 was signed and installed successfully on the connected iPhone.
 - The icon is dark green with a large ivory `B` and smaller `log`, matching the in-app identity.
+
+
+## October 17, 2026 — onboarding and weekly workflow (1.5.6 build 15)
+
+- First launch now collects the athlete name, dietitian name, and dietitian email before normal use. Profile editing remains available from settings.
+- Development API configuration is no longer exposed to athletes; the current local endpoint is bundled as product configuration.
+- The Plan upload screen has a simplified PDF/photo flow and separate saved-plan output.
+- Progress has one weekly-update action. It reveals the summary directly, and native iOS handling opens the email draft.
+- UI regression checks, all 14 backend tests, plist validation, signed device build, and physical-device installation pass.
+
+
+## October 17, 2026 — detailed green progress design (1.5.7 build 16)
+
+- Journal, Plan, and weekly-update actions now share the green outlined visual treatment introduced by the Plan chooser.
+- Weekly Progress uses a composed seven-day overview, green section accents, refined averages with units, a meal-count pill, and green consistency indicators.
+- Build 16 passed the JavaScript behavior/syntax test, plist validation, diff validation, signed device build, and physical-device installation.

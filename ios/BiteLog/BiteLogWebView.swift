@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 import WebKit
 
 struct BiteLogWebView: UIViewRepresentable {
@@ -36,6 +37,26 @@ struct BiteLogWebView: UIViewRepresentable {
 
     final class Coordinator: NSObject, WKScriptMessageHandler, WKNavigationDelegate {
         weak var webView: WKWebView?
+
+        func webView(
+            _ webView: WKWebView,
+            decidePolicyFor navigationAction: WKNavigationAction,
+            decisionHandler: @escaping (WKNavigationActionPolicy) -> Void
+        ) {
+            guard let url = navigationAction.request.url,
+                  url.scheme?.lowercased() == "mailto" else {
+                decisionHandler(.allow)
+                return
+            }
+
+            decisionHandler(.cancel)
+            UIApplication.shared.open(url, options: [:]) { opened in
+                guard !opened else { return }
+                DispatchQueue.main.async {
+                    webView.evaluateJavaScript("window.emailOpenFailed && window.emailOpenFailed();", completionHandler: nil)
+                }
+            }
+        }
 
         func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
             sendBridgeState("ready")
