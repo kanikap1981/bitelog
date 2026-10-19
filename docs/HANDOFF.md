@@ -649,3 +649,56 @@ DEVELOPER_DIR=/Users/kanika/Downloads/Xcode.app/Contents/Developer xcrun devicec
 - The GitHub remote is empty and the command-line push failed because GitHub credentials are not configured on this laptop. Local history is intact; authenticate GitHub and push `main` before switching laptops.
 - App Store submission still needs a public privacy policy/support website, App Privacy answers, privacy manifest review, screenshots, and App Store Connect metadata.
 - Next: complete the cellular-data device test, then build the public website/privacy pages and prepare the App Store archive.
+
+## October 18, 2026 — weekly Apple Health totals (1.6.3 build 22)
+
+### Completed
+
+- Apple Health sync now collects rolling seven-day totals for active calories, steps, and workout minutes in addition to today’s values.
+- The weekly dietitian update uses those seven-day totals and does not include heart rate.
+- An older cached Health snapshot produces a clear instruction to sync movement from Today before building the update.
+- Added behavior coverage for the formatted Apple Health section in the weekly update.
+- Built BiteLog successfully with automatic signing for team `YX8ZU7XXF4`.
+- Current branch: `main`.
+
+### Files changed
+
+- `ios/BiteLog/HealthKitManager.swift`
+- `ios/BiteLog/Resources/index.html`
+- `ios/BiteLog/Info.plist`
+- `ios/tests/photo-analysis.test.cjs`
+- `docs/CURRENT_STATE.md`
+- `docs/HANDOFF.md`
+
+### Exact run commands
+
+```bash
+cd /Users/kanika/Documents/Healthapp/BiteLog-v1.2-production
+node ios/tests/photo-analysis.test.cjs
+plutil -lint ios/BiteLog/Info.plist
+git diff --check
+/Users/kanika/Downloads/Xcode.app/Contents/Developer/usr/bin/xcodebuild \
+  -project ios/BiteLogHealth.xcodeproj -scheme BiteLog -configuration Debug \
+  -destination generic/platform=iOS -derivedDataPath /tmp/BiteLogWeeklyHealthSigned \
+  DEVELOPMENT_TEAM=YX8ZU7XXF4 CODE_SIGN_STYLE=Automatic \
+  -allowProvisioningUpdates build
+DEVELOPER_DIR=/Users/kanika/Downloads/Xcode.app/Contents/Developer xcrun devicectl device install app \
+  --device F6C55681-B06F-5583-A7D3-CB0D887F7B56 \
+  /tmp/BiteLogWeeklyHealthSigned/Build/Products/Debug-iphoneos/BiteLog.app
+```
+
+### Exact test steps
+
+1. Install build 22 on the iPhone and open Today.
+2. Tap Sync movement and allow the requested Apple Health read categories.
+3. Confirm Today shows steps, active calories, and workout minutes for the current day.
+4. Open Progress and tap Build my weekly update for the dietitian.
+5. Confirm the update contains a Last 7 days from Apple Health section with active calories, steps, and workout minutes.
+6. Confirm heart rate is not included in the update.
+7. Tap Email dietitian and confirm the same seven-day movement totals appear in the draft before sending.
+
+### Known issues and next recommended task
+
+- Build 22 has not yet been installed on the physical iPhone. The first install attempt lost the device connection, and the retry was not approved.
+- The seven-day values still need one physical-device comparison against the Health app.
+- Next: install build 22, sync movement, compare the totals with Apple Health, and inspect the email draft.

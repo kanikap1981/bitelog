@@ -7,6 +7,11 @@ struct BiteLogHealthSnapshot: Codable {
     let steps: Int
     let workoutMinutes: Int
     let latestHeartRate: Int?
+    let weekStart: String
+    let weekEnd: String
+    let weeklyActiveCalories: Int
+    let weeklySteps: Int
+    let weeklyWorkoutMinutes: Int
     let warnings: [String]
 }
 
@@ -59,20 +64,37 @@ final class HealthKitManager {
     }
 
     func snapshotForToday(completion: @escaping (BiteLogHealthSnapshot) -> Void) {
+        let calendar = Calendar.current
+        let todayStart = calendar.startOfDay(for: Date())
+        let weekStart = calendar.date(byAdding: .day, value: -6, to: todayStart) ?? todayStart
+        let end = Date()
+
         guard HKHealthStore.isHealthDataAvailable() else {
-            completion(BiteLogHealthSnapshot(date: Self.dayString(Date()), activeCalories: 0, steps: 0, workoutMinutes: 0, latestHeartRate: nil, warnings: ["Apple Health is unavailable on this device."]))
+            completion(BiteLogHealthSnapshot(
+                date: Self.dayString(todayStart),
+                activeCalories: 0,
+                steps: 0,
+                workoutMinutes: 0,
+                latestHeartRate: nil,
+                weekStart: Self.dayString(weekStart),
+                weekEnd: Self.dayString(end),
+                weeklyActiveCalories: 0,
+                weeklySteps: 0,
+                weeklyWorkoutMinutes: 0,
+                warnings: ["Apple Health is unavailable on this device."]
+            ))
             return
         }
 
-        let calendar = Calendar.current
-        let start = calendar.startOfDay(for: Date())
-        let end = Date()
         let group = DispatchGroup()
         let lock = NSLock()
 
         var activeCalories: Double = 0
         var steps: Double = 0
         var workoutMinutes: Double = 0
+        var weeklyActiveCalories: Double = 0
+        var weeklySteps: Double = 0
+        var weeklyWorkoutMinutes: Double = 0
         var heartRate: Double?
         var warnings: [String] = []
 
@@ -81,36 +103,59 @@ final class HealthKitManager {
         }
 
         group.enter()
-        cumulativeQuantity(.activeEnergyBurned, unit: .kilocalorie(), start: start, end: end) { value, error in
+        cumulativeQuantity(.activeEnergyBurned, unit: .kilocalorie(), start: todayStart, end: end) { value, error in
             if let error { record("Active energy: \(error.localizedDescription)") }
             lock.lock(); activeCalories = value ?? 0; lock.unlock(); group.leave()
         }
 
         group.enter()
-        cumulativeQuantity(.stepCount, unit: .count(), start: start, end: end) { value, error in
+        cumulativeQuantity(.stepCount, unit: .count(), start: todayStart, end: end) { value, error in
             if let error { record("Steps: \(error.localizedDescription)") }
             lock.lock(); steps = value ?? 0; lock.unlock(); group.leave()
         }
 
         group.enter()
-        totalWorkoutMinutes(start: start, end: end) { value, error in
+        totalWorkoutMinutes(start: todayStart, end: end) { value, error in
             if let error { record("Workouts: \(error.localizedDescription)") }
             lock.lock(); workoutMinutes = value ?? 0; lock.unlock(); group.leave()
         }
 
         group.enter()
-        latestQuantity(.heartRate, unit: HKUnit.count().unitDivided(by: .minute()), start: start, end: end) { value, error in
+        latestQuantity(.heartRate, unit: HKUnit.count().unitDivided(by: .minute()), start: todayStart, end: end) { value, error in
             if let error { record("Heart rate: \(error.localizedDescription)") }
             lock.lock(); heartRate = value; lock.unlock(); group.leave()
         }
 
+        group.enter()
+        cumulativeQuantity(.activeEnergyBurned, unit: .kilocalorie(), start: weekStart, end: end) { value, error in
+            if let error { record("Seven day active energy: \(error.localizedDescription)") }
+            lock.lock(); weeklyActiveCalories = value ?? 0; lock.unlock(); group.leave()
+        }
+
+        group.enter()
+        cumulativeQuantity(.stepCount, unit: .count(), start: weekStart, end: end) { value, error in
+            if let error { record("Seven day steps: \(error.localizedDescription)") }
+            lock.lock(); weeklySteps = value ?? 0; lock.unlock(); group.leave()
+        }
+
+        group.enter()
+        totalWorkoutMinutes(start: weekStart, end: end) { value, error in
+            if let error { record("Seven day workouts: \(error.localizedDescription)") }
+            lock.lock(); weeklyWorkoutMinutes = value ?? 0; lock.unlock(); group.leave()
+        }
+
         group.notify(queue: .main) {
             completion(BiteLogHealthSnapshot(
-                date: Self.dayString(start),
+                date: Self.dayString(todayStart),
                 activeCalories: Int(activeCalories.rounded()),
                 steps: Int(steps.rounded()),
                 workoutMinutes: Int(workoutMinutes.rounded()),
                 latestHeartRate: heartRate.map { Int($0.rounded()) },
+                weekStart: Self.dayString(weekStart),
+                weekEnd: Self.dayString(end),
+                weeklyActiveCalories: Int(weeklyActiveCalories.rounded()),
+                weeklySteps: Int(weeklySteps.rounded()),
+                weeklyWorkoutMinutes: Int(weeklyWorkoutMinutes.rounded()),
                 warnings: warnings
             ))
         }

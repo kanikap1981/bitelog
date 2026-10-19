@@ -193,3 +193,10 @@ The selected folder is now the local Git checkout on branch `main`, with `origin
 - BiteLog 1.6.2 build 21 uses the HTTPS backend automatically, migrates existing installs away from the Mac LAN URL, and no longer requests local-network access.
 - All 14 backend tests, the iOS JavaScript behavior/syntax test, plist validation, signed device build, physical-device installation, and production error-log scan pass.
 - The GitHub remote is still empty because command-line GitHub authentication is missing; the local branch contains the complete history.
+
+## October 18, 2026 — weekly Apple Health totals (1.6.3 build 22)
+
+- Apple Health sync now reads today’s movement plus rolling seven-day totals for active calories, steps, and workout minutes.
+- The reviewed weekly update includes those seven-day totals before BiteLog opens the athlete’s email composer.
+- If movement has not been synced with the new build, the update asks the athlete to sync from Today instead of presenting a stale one-day snapshot.
+- The JavaScript behavior test, plist validation, diff validation, unsigned build, and signed device build pass. Installation on the connected iPhone is still pending because the device connection reset during the first attempt and the retry was not approved.
