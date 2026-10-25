@@ -210,3 +210,11 @@ The selected folder is now the local Git checkout on branch `main`, with `origin
 - A stale Settings footer was corrected, `ITSAppUsesNonExemptEncryption` was added, and corrected build 23 was uploaded for TestFlight processing.
 - The exact build 23 archive was installed successfully on Kanika's connected iPhone for final validation.
 - External TestFlight distribution to Amie still requires Apple to finish processing build 23, completion of TestFlight information, and Amie's tester email.
+
+## October 25, 2026 — App Store privacy declaration
+
+- App Store Connect privacy responses were corrected and published for BiteLog 1.6.3.
+- The public label now declares five data types: Health, Photos or Videos, Audio Data, Other User Content, and Other Diagnostic Data.
+- Each declared type is used only for App Functionality, is not linked to the user's identity, and is not used for tracking.
+- Incorrect declarations for advertising, interaction tracking, contacts, email messages, crash/performance analytics, Apple Health fitness data kept on device, environment scanning, hands, and head movement were removed.
+- Apple removed the privacy-information submission error. Version 1.6.3 build 23 now shows an enabled `Add for Review` button and remains in `Prepare for Submission`; it has not been submitted for public App Review.

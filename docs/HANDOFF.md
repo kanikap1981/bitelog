@@ -1,5 +1,53 @@
 # BiteLog handoff — October 17, 2026
 
+## October 25, 2026 — App Store privacy ready
+
+### Completed
+
+- Reviewed the production iOS and backend data flows against Apple's App Privacy definitions.
+- Published a corrected App Store privacy label with Health, Photos or Videos, Audio Data, Other User Content, and Other Diagnostic Data.
+- Marked every declared type as App Functionality only, not linked to identity, and not used for tracking.
+- Verified that App Store Connect no longer shows `Unable to Add for Review`; version 1.6.3 build 23 has an enabled `Add for Review` button.
+- The public App Store submission has not been started.
+
+### Files changed
+
+- `docs/CURRENT_STATE.md`
+- `docs/HANDOFF.md`
+
+### Current branch
+
+- `main`
+
+### Known issues
+
+- TestFlight external build 23 is still awaiting Apple's beta review.
+- Digital Services Act trader information remains unset for EU distribution.
+- Public App Store version 1.6.3 remains in `Prepare for Submission` until `Add for Review` and the final submission are confirmed.
+
+### Next recommended task
+
+- Review the final App Store submission summary, then add version 1.6.3 to review and submit it to Apple.
+
+### Exact run commands
+
+No local runtime command is required for this metadata-only update. To verify the repository state:
+
+```bash
+cd /Users/kanika/Documents/Healthapp/BiteLog-v1.2-production
+git status --short --branch
+```
+
+### Exact test steps
+
+1. Open BiteLog in App Store Connect.
+2. Open App Privacy and confirm it says `Published` with five data types.
+3. Open iOS App Version 1.6.3 and confirm `Add for Review` is enabled with no privacy warning.
+
+### Proposed commit message
+
+`Document published App Store privacy label`
+
 ## Repository
 
 - Project: `/Users/kanika/Documents/Healthapp/BiteLog-v1.2-production`
