@@ -200,3 +200,13 @@ The selected folder is now the local Git checkout on branch `main`, with `origin
 - The reviewed weekly update includes those seven-day totals before BiteLog opens the athlete’s email composer.
 - If movement has not been synced with the new build, the update asks the athlete to sync from Today instead of presenting a stale one-day snapshot.
 - The JavaScript behavior test, plist validation, diff validation, unsigned build, and signed device build pass. Installation on the connected iPhone is still pending because the device connection reset during the first attempt and the retry was not approved.
+
+## October 24, 2026 — App Store Connect upload
+
+- The Apple Developer Program membership for `kanika@themodernhealth.com.au` is active under team `YX8ZU7XXF4` through October 19, 2027.
+- BiteLog now uses the Modern Health bundle identifier `au.com.themodernhealth.BiteLog`.
+- App Store Connect app record `6826741685` was created with the public name BiteLog and English (Australia) as its primary language.
+- BiteLog 1.6.3 build 22 was archived with HealthKit and uploaded successfully. Apple processed it, extracted the BiteLog icon, and marked it Ready to Submit after export compliance was completed.
+- A stale Settings footer was corrected, `ITSAppUsesNonExemptEncryption` was added, and corrected build 23 was uploaded for TestFlight processing.
+- The exact build 23 archive was installed successfully on Kanika's connected iPhone for final validation.
+- External TestFlight distribution to Amie still requires Apple to finish processing build 23, completion of TestFlight information, and Amie's tester email.

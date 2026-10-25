@@ -702,3 +702,59 @@ DEVELOPER_DIR=/Users/kanika/Downloads/Xcode.app/Contents/Developer xcrun devicec
 - Build 22 has not yet been installed on the physical iPhone. The first install attempt lost the device connection, and the retry was not approved.
 - The seven-day values still need one physical-device comparison against the Health app.
 - Next: install build 22, sync movement, compare the totals with Apple Health, and inspect the email draft.
+
+## October 24, 2026 — Modern Health App Store upload
+
+### Completed
+
+- Confirmed the active Apple Developer Program account is `kanika@themodernhealth.com.au`, team `YX8ZU7XXF4`.
+- Registered Kanika's connected iPhone and the HealthKit-capable identifier `au.com.themodernhealth.BiteLog` to that team.
+- Created the BiteLog App Store Connect record (`6826741685`) with English (Australia) and SKU `BITELOG-IOS-2026`.
+- Updated both Xcode configurations to use team `YX8ZU7XXF4`, bundle identifier `au.com.themodernhealth.BiteLog`, version 1.6.3, and build 23.
+- Created and uploaded build 22 successfully. Apple processed it, extracted the BiteLog icon, and marked it Ready to Submit after the export-compliance declaration.
+- Corrected the stale Settings version footer, added `ITSAppUsesNonExemptEncryption = false`, then archived and uploaded build 23 successfully.
+- Installed the exact build 23 archive on Kanika's connected iPhone.
+- Current branch: `main`.
+
+### Files changed
+
+- `ios/BiteLogHealth.xcodeproj/project.pbxproj`
+- `ios/BiteLog/Info.plist`
+- `ios/BiteLog/Resources/index.html`
+- `docs/CURRENT_STATE.md`
+- `docs/HANDOFF.md`
+
+### Known issues
+
+- Apple is still processing build 23, so it cannot yet be assigned to a TestFlight group.
+- External testing for Amie may require TestFlight beta review and completion of Apple's test-information questions.
+- Amie's tester email is not stored in the repository and must be supplied when inviting her.
+- The Modern Health bundle identifier creates a separate installation from the older personal-team build, so local-only data does not migrate automatically.
+
+### Next recommended task
+
+Wait for build 23 to finish processing, complete TestFlight information, create an external TestFlight group, invite Amie, and complete one device pass covering meal photo, voice log, plan upload, Apple Health sync, weekly update, and email draft.
+
+### Exact run commands
+
+```bash
+cd /Users/kanika/Documents/Healthapp/BiteLog-v1.2-production
+node ios/tests/photo-analysis.test.cjs
+plutil -lint ios/BiteLog/Info.plist
+git diff --check
+/Users/kanika/Downloads/Xcode.app/Contents/Developer/usr/bin/xcodebuild \
+  -project ios/BiteLogHealth.xcodeproj -scheme BiteLog -configuration Release \
+  -destination 'generic/platform=iOS' \
+  -archivePath /tmp/BiteLogModernHealth.xcarchive \
+  -allowProvisioningUpdates archive
+```
+
+### Exact test steps
+
+1. Open the newly installed BiteLog on Kanika's iPhone and complete onboarding.
+2. Photograph a meal, review the estimate, save it, and confirm it appears in Today and Food Log.
+3. Record a spoken meal and confirm calories/protein are calculated before saving.
+4. Upload and analyze the sample plan, then confirm the saved plan and weekly allowances.
+5. Sync Apple Health and compare today's values plus seven-day totals with the Health app.
+6. Build the weekly update and confirm meals, reflections, and seven-day movement totals appear in the email draft.
+7. After Apple finishes processing build 23, add it to an external TestFlight group and invite Amie.
