@@ -17,12 +17,13 @@ VOICE_MEAL_SCHEMA = {
         "understood": {"type": "boolean"},
         "name": {"type": "string"},
         "calories": {"type": "integer", "minimum": 0, "maximum": 10000},
+        "carbs": {"type": "number", "minimum": 0, "maximum": 2000},
         "protein": {"type": "number", "minimum": 0, "maximum": 1000},
         "confidence": {"type": "number", "minimum": 0, "maximum": 1},
         "description": {"type": "string"},
         "assumptions": {"type": "array", "items": {"type": "string"}},
     },
-    "required": ["understood", "name", "calories", "protein", "confidence", "description", "assumptions"],
+    "required": ["understood", "name", "calories", "carbs", "protein", "confidence", "description", "assumptions"],
     "additionalProperties": False,
 }
 
@@ -68,7 +69,7 @@ async def analyze_voice_meal(
                         "instructions": (
                             "Convert a spoken food log into one estimated meal. Set understood=false when the transcript "
                             "does not clearly describe food or drink the athlete consumed; use empty name, zero nutrition, "
-                            "and explain why in description. Otherwise estimate total calories and protein conservatively, "
+                            "and explain why in description. Otherwise estimate total calories, carbohydrate, and protein conservatively, "
                             "with assumptions about missing portions or ingredients."
                         ),
                         "input": [{"role": "user", "content": [{"type": "input_text", "text": transcript}]}],

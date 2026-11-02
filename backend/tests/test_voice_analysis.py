@@ -16,6 +16,7 @@ AUDIO = "data:audio/mp4;base64," + base64.b64encode(b"short-audio-fixture" * 4).
 VOICE_ESTIMATE = dict(
     name="Eggs and toast",
     calories=420,
+    carbs=34.0,
     protein=23.5,
     confidence=0.72,
     description="Two eggs with toast",
@@ -72,7 +73,7 @@ class VoiceAnalysisTests(unittest.TestCase):
             estimate.pop("transcript")
             estimate["understood"] = understood
             if not understood:
-                estimate.update(name="", calories=0, protein=0, confidence=0)
+                estimate.update(name="", calories=0, carbs=0, protein=0, confidence=0)
             return httpx.Response(200, json={"status": "completed", "output": [{"content": [{"type": "output_text", "text": json.dumps(estimate)}]}]})
 
         return patch("app.services.openai_voice_meal_analyzer.httpx.AsyncClient.post", post), calls

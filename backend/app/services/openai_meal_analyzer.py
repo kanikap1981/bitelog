@@ -15,12 +15,13 @@ MEAL_SCHEMA = {
     "properties": {
         "name": {"type": "string"},
         "calories": {"type": "integer", "minimum": 0, "maximum": 10000},
+        "carbs": {"type": "number", "minimum": 0, "maximum": 2000},
         "protein": {"type": "number", "minimum": 0, "maximum": 1000},
         "confidence": {"type": "number", "minimum": 0, "maximum": 1},
         "description": {"type": "string"},
         "assumptions": {"type": "array", "items": {"type": "string"}},
     },
-    "required": ["name", "calories", "protein", "confidence", "description", "assumptions"],
+    "required": ["name", "calories", "carbs", "protein", "confidence", "description", "assumptions"],
     "additionalProperties": False,
 }
 
@@ -61,9 +62,10 @@ async def analyze_meal(image_url: str, settings: Settings) -> MealEstimate:
             "You estimate food nutrition from a meal photo for an athlete's food log. Inspect every visible food and drink, "
             "estimate realistic portion sizes, and include likely cooking oil, butter, dressings, sauces, toppings, and other "
             "calorie-dense ingredients when the photo suggests them. Calculate the total calories and protein for the whole "
-            "visible meal, not for a single component. Do not invent ingredients that are unsupported by the image. Be "
+            "visible meal, not for a single component. Estimate total carbohydrate and protein in grams. Do not invent "
+            "ingredients that are unsupported by the image. Be "
             "conservative and transparent rather than falsely precise. Return the likely meal name, total calories, total "
-            "protein in grams, a confidence from 0 to 1, a short description naming the visible components, and concise "
+            "carbohydrate and protein in grams, a confidence from 0 to 1, a short description naming the visible components, and concise "
             "assumptions about portions or hidden ingredients. If portion size is unclear, state the assumed serving size. "
             "This is an estimate, not medical advice."
         ),

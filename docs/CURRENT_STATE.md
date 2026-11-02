@@ -1,5 +1,13 @@
 # Current state / handoff
 
+## November 1, 2026 — carbohydrates added to meal estimates
+
+- Photo and spoken-meal analysis now return calories, carbohydrates, protein, confidence, and assumptions from the server.
+- The iOS meal confirmation form shows all three nutrition values. Carbohydrates are saved with manual, photo, and voice meals and appear in Meals today and Food Log.
+- The production backend at `https://bitelog-api.vercel.app` is deployed with the new contract. A live oatmeal-photo request returned HTTP 200 with 440 kcal, 78g carbohydrates, and 17g protein; a live spoken-meal request returned HTTP 200 with 410 kcal, 56g carbohydrates, and 22g protein.
+- All 15 backend tests, the bundled iOS JavaScript behavior/syntax test, and Info.plist validation pass.
+- BiteLog remains version 1.6.4 build 24. Full Xcode 26.3 is installed and the connected `Kanika’s iPhone` is available as a run destination. Build 24 still needs to be archived and uploaded to App Store Connect.
+
 ## November 1, 2026 — meal photo and plan analysis restored (1.6.4 build 24 source)
 
 - Production photo and plan analysis had a shared operational failure: OpenAI returned `401 invalid_api_key` before either analyzer could process its input. The protected Vercel credential was rotated and production was redeployed at `https://bitelog-api.vercel.app`.
@@ -8,7 +16,7 @@
 - Plan PDFs continue to use the Responses API file input and plan images use high-detail vision. Provider credential and quota failures now produce accurate, actionable messages without exposing provider data.
 - Live production checks returned HTTP 200 for health, two supplied food photos, the full five-page `Kanika Pandey V8.pdf`, a rendered image of its first page, a spoken meal, and journal transcription. The PDF preserved the complete schedule and produced estimated allowances because the plan contains no explicit calorie or protein target.
 - All 15 backend tests, the bundled iOS JavaScript behavior/syntax test, plist/entitlement lint, diff validation, and the post-deployment error scan pass.
-- The source is version 1.6.4 build 24. This laptop currently has only Apple Command Line Tools and no full Xcode installation, so build 24 has not been compiled, installed on an iPhone, or uploaded to App Store Connect from this laptop.
+- The source is version 1.6.4 build 24. Full Xcode 26.3 is installed; build 24 has not yet been archived or uploaded to App Store Connect.
 - Apple Health permissions/data, the native Mail composer, camera capture, save/delete presentation, and the visual quality of real iPhone photos still require a manual physical-device pass before submission.
 
 ## What has been proven

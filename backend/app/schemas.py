@@ -18,6 +18,7 @@ class ObjectMealAnalysisRequest(BaseModel):
 class MealEstimate(BaseModel):
     name: str = Field(min_length=1, pattern=r"\S")
     calories: int = Field(ge=0, le=10000)
+    carbs: float = Field(ge=0, le=2000)
     protein: float = Field(ge=0, le=1000)
     confidence: float = Field(ge=0, le=1)
     description: str = ""

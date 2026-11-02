@@ -1,5 +1,64 @@
 # BiteLog handoff — October 17, 2026
 
+## November 1, 2026 — carbohydrates in meal logging
+
+### Completed
+
+- Added carbohydrates to the structured photo and spoken-meal response contract.
+- Updated the photo estimate confirmation to show calories, carbohydrates, and protein together.
+- Saved carbohydrates for manual, photo, and spoken meals and displayed them in Meals today and Food Log.
+- Deployed the updated backend to `https://bitelog-api.vercel.app`.
+- Verified live production photo and voice requests return all three nutrition values with HTTP 200.
+- Passed all 15 backend tests, the iOS JavaScript behavior/syntax test, and Info.plist validation.
+- Current branch: `main`.
+
+### Files changed
+
+- `backend/app/schemas.py`
+- `backend/app/services/openai_meal_analyzer.py`
+- `backend/app/services/openai_voice_meal_analyzer.py`
+- `backend/tests/test_photo_analysis.py`
+- `backend/tests/test_voice_analysis.py`
+- `ios/BiteLog/Info.plist`
+- `ios/BiteLog/Resources/index.html`
+- `ios/tests/photo-analysis.test.cjs`
+- `docs/CURRENT_STATE.md`
+- `docs/HANDOFF.md`
+
+### Known issues
+
+- Meal nutrition is an estimate and depends on visible portions and ingredients.
+- Existing meals saved before build 24 have no carbohydrate value and display 0g carbohydrates.
+- Build 24 still needs to be archived and uploaded to App Store Connect, then assigned to Amie’s TestFlight group.
+
+### Next recommended task
+
+Archive BiteLog 1.6.4 build 24 with the distribution team, upload it to App Store Connect, wait for processing, and assign it to Amie’s TestFlight group.
+
+### Exact run commands
+
+```bash
+cd /Users/kanika/Documents/Healthapp/BiteLog-v1.2-production/backend
+PYTHONDONTWRITEBYTECODE=1 /tmp/bitelog-testenv/bin/python -m unittest discover -s tests -v
+
+cd /Users/kanika/Documents/Healthapp/BiteLog-v1.2-production
+node ios/tests/photo-analysis.test.cjs
+plutil -lint ios/BiteLog/Info.plist
+```
+
+### Exact test steps
+
+1. Install or open build 24.
+2. Add a meal from a photo and tap Estimate from photo.
+3. Confirm meal name, calories, carbohydrates, protein, confidence, and assumptions appear.
+4. Save the meal and confirm the sheet closes and all three nutrition values appear in Meals today and Food Log.
+5. Log a meal by voice and confirm its calories, carbohydrates, and protein are saved.
+6. Delete both meals and confirm they disappear.
+
+### Proposed commit message
+
+`Add carbohydrate estimates to meal logging`
+
 ## November 1, 2026 — photo and plan analysis restored
 
 ### Completed
