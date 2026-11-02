@@ -1,5 +1,13 @@
 # Current state / handoff
 
+## November 1, 2026 — build 24 submitted for external TestFlight review
+
+- BiteLog 1.6.4 build 24 finished App Store Connect processing and was added to the existing external TestFlight group `Amie testing`.
+- Test instructions ask testers to cover photo and voice meal logging, calories/carbohydrates/protein/confidence/assumptions, PDF/image plan upload, save/delete, Apple Health, Journal, weekly update, and the email draft.
+- Apple now reports build 24 as `Waiting for Review`; it is not yet installable by external testers. Build 23 remains in `Testing` with eight recorded sessions.
+- The external group reports zero named testers and uses the public link `https://testflight.apple.com/join/Pu6yxcTU`. Amie can continue using build 23 through that link while build 24 awaits Beta App Review.
+- The `finish-bitelog-build-24-testflight` monitor now watches for approval, rejection, information requests, or another actionable error and will verify the public link when approval occurs.
+
 ## November 1, 2026 — App Review information package prepared
 
 - Apple previously requested additional information under Guideline 2.1 for build 23: a physical-iPhone workflow recording, product and audience explanation, reviewer access instructions, external-service disclosure, regional-availability confirmation, and regulatory/content clarification.

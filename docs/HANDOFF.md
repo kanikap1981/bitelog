@@ -1033,3 +1033,40 @@ PYTHONDONTWRITEBYTECODE=1 .venv/bin/python -m unittest discover -s tests -v
 4. Confirm plan analysis displays the extracted plan and allowances.
 5. Confirm the weekly update contains meals, plan context, reflections, and synced movement when available.
 6. Confirm Email dietitian opens a populated draft and does not send automatically.
+
+# November 1, 2026 — build 24 external TestFlight submission
+
+## Completed
+
+- Confirmed BiteLog 1.6.4 build 24 finished processing in App Store Connect.
+- Added build 24 to the external `Amie testing` group with automatic tester notification enabled.
+- Supplied TestFlight instructions covering photo and voice meal estimates, macronutrients, plan uploads, save/delete, Apple Health, Journal, weekly update, and email draft.
+- Submitted build 24 to Beta App Review. App Store Connect now shows `Waiting for Review`.
+- Updated the active heartbeat monitor to stay quiet while unchanged and notify on approval, rejection, an information request, or another actionable error.
+- Current branch: `main`.
+
+## Files changed
+
+- `docs/CURRENT_STATE.md`
+- `docs/HANDOFF.md`
+
+## Known issues
+
+- Build 24 is not yet available to external testers because Beta App Review is pending.
+- The `Amie testing` group shows zero named testers; external access is through the public TestFlight link.
+- Build 23 remains available and has eight recorded sessions.
+
+## Next recommended task
+
+Wait for Beta App Review. When Apple approves build 24, verify `https://testflight.apple.com/join/Pu6yxcTU` offers the update and ask Amie to install it.
+
+## Exact run commands
+
+No local command is required. Status is managed in App Store Connect.
+
+## Exact test steps
+
+1. Open the `Amie testing` external group in App Store Connect.
+2. Confirm build 24 changes from `Waiting for Review` to `Testing`.
+3. Open `https://testflight.apple.com/join/Pu6yxcTU` and confirm BiteLog is accepting testers.
+4. Ask Amie to open TestFlight, install or update BiteLog to 1.6.4 (24), and confirm the build number.
