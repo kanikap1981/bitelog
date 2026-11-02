@@ -981,3 +981,55 @@ git diff --check
 5. Sync Apple Health and compare today's values plus seven-day totals with the Health app.
 6. Build the weekly update and confirm meals, reflections, and seven-day movement totals appear in the email draft.
 7. After Apple finishes processing build 23, add it to an external TestFlight group and invite Amie.
+
+# November 1, 2026 — App Review response package
+
+## Completed
+
+- Recovered Apple's prior Guideline 2.1 Information Needed requirements for BiteLog build 23.
+- Prepared a full Resolution Center reply, App Review Notes, physical-iPhone recording script, and submission checklist for version 1.6.4 build 24.
+- Added the controlled-launch context: approximately 20 to 30 athletes from a dietitian's client base will validate the first release before broader availability; the app remains compatible with any dietitian.
+- Created and visually verified a fictional sample plan PDF for App Review without Kanika's personal plan data.
+- Verified the sample plan against the live production API: HTTP 200 with the expected explicit daily and weekly calorie/protein targets.
+- Reviewed `ScreenRecording_11-01-2026 18-13-07_1.MP4`. It should not be submitted because it starts inside BiteLog, omits a new photo-analysis calculation/save, exposes personal inbox and email information, and shows an unsuccessful Apple Health refresh.
+- Verified the copy against the current app and backend architecture: local on-device records, production HTTPS API on Vercel, server-side OpenAI analysis, optional read-only Apple Health access, and user-controlled iOS email drafting.
+- Current branch: `main` (five commits ahead of `origin/main` before this documentation commit).
+
+## Files changed
+
+- `docs/APP_REVIEW_RESPONSE.md`
+- `docs/CURRENT_STATE.md`
+- `docs/HANDOFF.md`
+- `docs/NEXT_TASKS.md`
+- `output/pdf/BiteLog-App-Review-Sample-Plan.pdf`
+
+## Known issues
+
+- Apple still needs a replacement physical-iPhone screen recording and the sample plan attached in App Store Connect.
+- App Store Connect must be checked to confirm that build 24 is selected and that the Resolution Center reply and App Review Notes were saved.
+- Assignment of build 24 to Amie's TestFlight group remains unconfirmed.
+- The production AI API has no account-level trial enforcement or durable rate limiting. A five-day trial must be enforced server-side with an installation identity, request caps, and an unrestricted App Review path before broad public distribution.
+
+## Next recommended task
+
+Record the replacement continuous physical-iPhone workflow using `docs/APP_REVIEW_RESPONSE.md`, then upload the video and `output/pdf/BiteLog-App-Review-Sample-Plan.pdf` and paste the prepared text into App Store Connect.
+
+## Exact run commands
+
+No code or backend command is required for this documentation-only work. To re-run the current automated checks before recording:
+
+```bash
+cd /Users/kanika/Documents/Healthapp/BiteLog-v1.2-production
+node ios/tests/photo-analysis.test.cjs
+cd backend
+PYTHONDONTWRITEBYTECODE=1 .venv/bin/python -m unittest discover -s tests -v
+```
+
+## Exact test steps
+
+1. Follow the physical-iPhone recording script in `docs/APP_REVIEW_RESPONSE.md`.
+2. Confirm photo analysis returns meal name, calories, carbohydrates, protein, confidence, and assumptions.
+3. Confirm the saved meal appears in Today and Food Log.
+4. Confirm plan analysis displays the extracted plan and allowances.
+5. Confirm the weekly update contains meals, plan context, reflections, and synced movement when available.
+6. Confirm Email dietitian opens a populated draft and does not send automatically.

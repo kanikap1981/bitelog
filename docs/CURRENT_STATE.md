@@ -1,5 +1,15 @@
 # Current state / handoff
 
+## November 1, 2026 — App Review information package prepared
+
+- Apple previously requested additional information under Guideline 2.1 for build 23: a physical-iPhone workflow recording, product and audience explanation, reviewer access instructions, external-service disclosure, regional-availability confirmation, and regulatory/content clarification.
+- `docs/APP_REVIEW_RESPONSE.md` now contains a complete Resolution Center reply, concise App Review Notes, a physical-iPhone recording script, and a submission checklist for BiteLog 1.6.4 build 24.
+- A fictional, non-personal sample plan was created at `output/pdf/BiteLog-App-Review-Sample-Plan.pdf` and visually verified for use as the App Review attachment.
+- The sample PDF was analyzed through the live production endpoint with HTTP 200 and returned its explicit 2,200 kcal/day, 140g protein/day, 15,400 kcal/week, and 980g protein/week targets without marking them as estimates.
+- The response accurately describes BiteLog as a local-first logging and dietitian-communication tool, identifies optional read-only Apple Health access, discloses the Vercel-hosted production API and server-side OpenAI use, and states that estimates require athlete review.
+- The supplied 32-second recording was reviewed and should be replaced: it starts inside the app, does not show a new photo estimate being calculated and saved, exposes personal inbox/email information, and shows an unsuccessful Apple Health refresh.
+- Apple still requires a replacement screen recording and the attachments to be supplied in App Store Connect. Their submission cannot be inferred from the code upload alone.
+
 ## November 1, 2026 — carbohydrates added to meal estimates
 
 - Photo and spoken-meal analysis now return calories, carbohydrates, protein, confidence, and assumptions from the server.

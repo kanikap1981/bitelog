@@ -1,5 +1,15 @@
 # Next tasks
 
+## Protect production AI usage before broad public release
+
+- Keep the first pilot limited to approximately 20 to 30 invited athletes through TestFlight while access controls are implemented.
+- Start a five-day trial when an installation makes its first AI analysis request, not merely when the app is installed.
+- Enforce the trial and per-day photo, voice, transcription, and plan-analysis allowances on the server. A client-only timer is not a security boundary.
+- Add a privacy-preserving installation identity and validate requests with Apple App Attest before relying on device-level limits.
+- Add backend rate limits, request-size limits, usage metrics, and budget alerts. Return a clear trial-ended or allowance-reached message without exposing provider details.
+- Provide App Review with a review path that is not blocked by an expired trial or quota.
+- Define the paid-access and entitlement model before public App Store distribution.
+
 ## Product priorities agreed October 25, 2026
 
 ### 1. Refresh the app design
