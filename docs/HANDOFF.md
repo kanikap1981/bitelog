@@ -9,6 +9,7 @@
 - Saved carbohydrates for manual, photo, and spoken meals and displayed them in Meals today and Food Log.
 - Deployed the updated backend to `https://bitelog-api.vercel.app`.
 - Verified live production photo and voice requests return all three nutrition values with HTTP 200.
+- Replaced the hardcoded `CFBundleVersion` with `$(CURRENT_PROJECT_VERSION)`, verified the archive reports version 1.6.4 build 24, and uploaded it successfully to App Store Connect.
 - Passed all 15 backend tests, the iOS JavaScript behavior/syntax test, and Info.plist validation.
 - Current branch: `main`.
 
