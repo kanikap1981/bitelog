@@ -1,5 +1,45 @@
 # BiteLog handoff — October 17, 2026
 
+## November 1, 2026 — BiteLog 1.6.4 submitted to App Review
+
+### Completed
+
+- Replaced the rejected App Store build with BiteLog 1.6.4 build 24.
+- Updated the App Store version to 1.6.4 and added the complete reviewer instructions requested under Guideline 2.1.
+- Attached the edited 1 minute 49 second physical-iPhone recording. It begins from the Home Screen and demonstrates photo meal analysis, meal saving, plan analysis, weekly progress, the email composer, and voice journaling without exposing the personal inbox or email addresses.
+- Submitted the public App Store version. Apple accepted the submission at 6:46 PM on November 1, 2026; submission ID `bb77318b-a96e-461e-9a00-0479b149e3c3` is `Waiting for Review`.
+- Verified TestFlight build 24 is assigned to both `Bitelog testing` and `Amie testing`; its external beta status is separately `Waiting for Review`.
+- Current branch: `main`.
+
+### Files changed
+
+- `docs/CURRENT_STATE.md`
+- `docs/HANDOFF.md`
+
+### Known issues
+
+- Apple has not yet approved either the public App Store submission or the external TestFlight build.
+- External testers cannot install build 24 until Beta App Review approves it.
+- The neutral sample plan remains at `output/pdf/BiteLog-App-Review-Sample-Plan.pdf`; App Store Connect's version attachment field accepted the MP4 recording only, so the reviewer notes explain that any simple plan PDF or image can be used.
+
+### Next recommended task
+
+Wait for Apple. If Apple requests more information, answer the exact request in App Store Connect without replacing build 24 unless Apple reports a build defect.
+
+### Exact run commands
+
+No local command is required. App Store Connect is the source of truth for both review states.
+
+### Exact test steps
+
+1. Open App Store Connect > BiteLog > App Review and confirm submission `bb77318b-a96e-461e-9a00-0479b149e3c3` shows `Waiting for Review`.
+2. Open TestFlight > iOS > 1.6.4 and confirm build 24 shows `Waiting for Review` and belongs to `Bitelog testing` and `Amie testing`.
+3. After Beta App Review approval, confirm Amie can install build 24 from TestFlight.
+
+### Proposed commit message
+
+`Record build 24 App Store resubmission`
+
 ## November 1, 2026 — carbohydrates in meal logging
 
 ### Completed

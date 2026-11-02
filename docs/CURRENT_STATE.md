@@ -1,5 +1,13 @@
 # Current state / handoff
 
+## November 1, 2026 — App Store resubmission waiting for review
+
+- BiteLog 1.6.4 build 24 is submitted for public App Review under submission `bb77318b-a96e-461e-9a00-0479b149e3c3`; Apple reports `Waiting for Review`.
+- The App Review Notes contain the requested purpose, audience, access path, external-service disclosure, regional consistency, and regulatory clarification.
+- `BiteLog-App-Review-Edited-Final.mp4` is attached in App Store Connect. The recording was captured on the physical iPhone, begins with launch from the Home Screen, and demonstrates the principal workflow with personal inbox and email addresses removed or redacted.
+- TestFlight build 24 remains separately `Waiting for Review` and is assigned to the internal `Bitelog testing` group and external `Amie testing` group. Amie cannot install build 24 until Apple approves the external beta.
+- Automatic App Store release is selected after approval.
+
 ## November 1, 2026 — build 24 reinstalled on Kanika's iPhone
 
 - Rebuilt the clean committed 1.6.4 source as build 24 with the Modern Health development signing profile and HealthKit entitlement.
