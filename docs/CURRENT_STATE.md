@@ -6,7 +6,7 @@
 - The iOS meal confirmation form shows all three nutrition values. Carbohydrates are saved with manual, photo, and voice meals and appear in Meals today and Food Log.
 - The production backend at `https://bitelog-api.vercel.app` is deployed with the new contract. A live oatmeal-photo request returned HTTP 200 with 440 kcal, 78g carbohydrates, and 17g protein; a live spoken-meal request returned HTTP 200 with 410 kcal, 56g carbohydrates, and 22g protein.
 - All 15 backend tests, the bundled iOS JavaScript behavior/syntax test, and Info.plist validation pass.
-- BiteLog remains version 1.6.4 build 24. Full Xcode 26.3 is installed and the connected `Kanika’s iPhone` is available as a run destination. Build 24 still needs to be archived and uploaded to App Store Connect.
+- BiteLog remains version 1.6.4 build 24. The signed App Store archive succeeded with the Modern Health team and was uploaded to App Store Connect successfully. Apple is processing the uploaded build before it can be assigned to Amie’s TestFlight group.
 
 ## November 1, 2026 — meal photo and plan analysis restored (1.6.4 build 24 source)
 

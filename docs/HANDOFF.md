@@ -29,11 +29,11 @@
 
 - Meal nutrition is an estimate and depends on visible portions and ingredients.
 - Existing meals saved before build 24 have no carbohydrate value and display 0g carbohydrates.
-- Build 24 still needs to be archived and uploaded to App Store Connect, then assigned to Amie’s TestFlight group.
+- Build 24 uploaded successfully and is processing in App Store Connect. It still needs to be assigned to Amie’s TestFlight group after processing completes.
 
 ### Next recommended task
 
-Archive BiteLog 1.6.4 build 24 with the distribution team, upload it to App Store Connect, wait for processing, and assign it to Amie’s TestFlight group.
+Wait for App Store Connect to finish processing build 24, then assign it to Amie’s TestFlight group and confirm she can install it.
 
 ### Exact run commands
 
