@@ -193,10 +193,10 @@ $('#photo').addEventListener('change',e=>{
         URL.revokeObjectURL(objectURL);
         if(version!==photoVersion)return;
         try{
-            const scale=Math.min(1,640/Math.max(img.width,img.height)),c=document.createElement('canvas');
+            const scale=Math.min(1,1280/Math.max(img.width,img.height)),c=document.createElement('canvas');
             c.width=Math.max(1,Math.round(img.width*scale));c.height=Math.max(1,Math.round(img.height*scale));
             c.getContext('2d').drawImage(img,0,0,c.width,c.height);
-            photoData=c.toDataURL('image/jpeg',.68);
+            photoData=c.toDataURL('image/jpeg',.84);
             if(!photoData.startsWith('data:image/jpeg;base64,'))throw new Error('Image conversion failed');
             $('#preview').src=photoData;$('#preview').hidden=false;
             $('#photoLabel').style.display='none';$('#estimateMeal').disabled=false;

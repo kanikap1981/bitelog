@@ -13,7 +13,7 @@ class Settings(BaseSettings):
 
     app_env: str = "development"
     openai_api_key: str = ""
-    openai_model: str = "gpt-5.6-luna"
+    openai_model: str = "gpt-6.1-sol"
     database_url: str = "postgresql://bitelog:bitelog@localhost:5432/bitelog"
     redis_url: str = "redis://localhost:6379/0"
 

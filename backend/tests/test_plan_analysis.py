@@ -76,6 +76,26 @@ class PlanAnalysisTests(unittest.TestCase):
         self.assertIn("valid PDF", response.json()["detail"])
         provider.assert_not_awaited()
 
+    def test_provider_auth_and_quota_errors_are_actionable(self):
+        async def unauthorized(client, url, **kwargs):
+            return httpx.Response(401, json={"error": {"message": "private provider detail"}})
+
+        async def limited(client, url, **kwargs):
+            return httpx.Response(429, json={"error": {"message": "private provider detail"}})
+
+        request = {"filename": "plan.txt", "content_type": "text/plain", "text": "2200 calories"}
+        with patch("app.services.openai_plan_analyzer.httpx.AsyncClient.post", unauthorized):
+            response = self.client.post("/v1/plans/analyze", json=request)
+        self.assertEqual(response.status_code, 503)
+        self.assertIn("credentials", response.json()["detail"])
+        self.assertNotIn("private provider detail", response.text)
+
+        with patch("app.services.openai_plan_analyzer.httpx.AsyncClient.post", limited):
+            response = self.client.post("/v1/plans/analyze", json=request)
+        self.assertEqual(response.status_code, 503)
+        self.assertIn("try again", response.json()["detail"].lower())
+        self.assertNotIn("private provider detail", response.text)
+
 
 if __name__ == "__main__":
     unittest.main()

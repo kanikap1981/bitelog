@@ -3,6 +3,7 @@ import base64
 import json
 import logging
 import re
+import time
 
 import httpx
 
@@ -102,6 +103,7 @@ async def analyze_plan(body: PlanAnalysisRequest, settings: Settings) -> PlanEst
         "input": [{"role": "user", "content": content}],
         "text": {"format": {"type": "json_schema", "name": "nutrition_plan", "strict": True, "schema": PLAN_SCHEMA}},
     }
+    started = time.monotonic()
     try:
         async with httpx.AsyncClient(timeout=httpx.Timeout(60.0, connect=10.0)) as client:
             response = await asyncio.wait_for(
@@ -116,8 +118,16 @@ async def analyze_plan(body: PlanAnalysisRequest, settings: Settings) -> PlanEst
         raise MealAnalysisError("Plan analysis timed out. The previous baseline was kept; please try again.", 504) from exc
     except httpx.RequestError as exc:
         raise MealAnalysisError("The server could not analyze this plan. The previous baseline was kept.", 503) from exc
+    logger.info(
+        "plan_provider model=%s status=%s duration_ms=%d",
+        settings.openai_model, response.status_code, (time.monotonic() - started) * 1000,
+    )
     if response.status_code >= 400:
         logger.warning("plan_provider status=%s", response.status_code)
+        if response.status_code in (401, 403):
+            raise MealAnalysisError("Plan analysis is temporarily unavailable because the server credentials need attention.", 503)
+        if response.status_code == 429:
+            raise MealAnalysisError("Plan analysis is temporarily busy. Please try again shortly.", 503)
         raise MealAnalysisError("The plan analysis service rejected this file. Try a clear image, PDF, or text file.", 503)
     try:
         result = PlanEstimate.model_validate(json.loads(_find_output_text(response.json())))

@@ -1,5 +1,120 @@
 # BiteLog handoff — October 17, 2026
 
+## November 1, 2026 — photo and plan analysis restored
+
+### Completed
+
+- Reproduced both reported production failures with a real food photo and `Kanika Pandey V8.pdf`.
+- Confirmed from Vercel runtime logs that both failures occurred before analysis because OpenAI rejected the deployed credential with HTTP 401.
+- Created a replacement server-only credential, stored it as a protected Vercel production secret, removed the temporary local copy, and deployed the corrected backend.
+- Increased meal-photo input from 640px/JPEG 0.68 to 1280px/JPEG 0.84 and changed the server vision request from low to high detail.
+- Improved meal estimation instructions to account for the entire visible meal, realistic portions, cooking oil, butter, sauces, dressings, and toppings while retaining explicit assumptions.
+- Updated the configured provider model to `gpt-6.1-sol` and added accurate plan credential/quota error handling.
+- Bumped the iOS source to BiteLog 1.6.4 build 24.
+- Live production tests returned HTTP 200 for health, two food-photo estimates, the full five-page PDF plan, the plan as an image, a spoken meal, and a journal transcription. Vercel recorded all eight post-deployment feature requests as HTTP 200 and no new runtime or HTTP 5xx errors.
+- Current branch: `main`.
+
+### Files changed
+
+- `backend/.env.example`
+- `backend/app/config.py`
+- `backend/app/services/openai_meal_analyzer.py`
+- `backend/app/services/openai_plan_analyzer.py`
+- `backend/tests/test_photo_analysis.py`
+- `backend/tests/test_plan_analysis.py`
+- `ios/BiteLog/Resources/index.html`
+- `ios/BiteLogHealth.xcodeproj/project.pbxproj`
+- `ios/tests/photo-analysis.test.cjs`
+- `docs/CURRENT_STATE.md`
+- `docs/HANDOFF.md`
+- `docs/NEXT_TASKS.md` already contained the uncommitted roadmap note and remains included in the working tree.
+
+### Known issues
+
+- Full Xcode is not installed on this laptop, so build 24 could not be compiled or installed here. The shell currently points to `/Library/Developer/CommandLineTools`.
+- Photo nutrition remains an estimate and must be reviewed by the athlete before saving. The two reference images produced plausible structured results, but accuracy varies with portion visibility and hidden ingredients.
+- Plans without explicit totals produce clearly labeled estimated allowance ranges. A single plan image can only extract the pages visible in that image; use the PDF for complete multi-page extraction.
+- Apple Health, native email composition, camera/microphone permissions, and final save/delete behavior need the physical-iPhone test below before App Store resubmission.
+
+### Next recommended task
+
+On a Mac with full Xcode, compile and install BiteLog 1.6.4 build 24 on Kanika's iPhone. Complete the physical-device test pass, then upload build 24 and update the App Review response only after Kanika approves the tested build.
+
+### Exact run commands
+
+Backend tests:
+
+```bash
+cd /Users/kanika/Documents/Healthapp/BiteLog-v1.2-production/backend
+PYTHONDONTWRITEBYTECODE=1 /tmp/bitelog-testenv/bin/python -m unittest discover -s tests -v
+```
+
+iOS bundle checks:
+
+```bash
+cd /Users/kanika/Documents/Healthapp/BiteLog-v1.2-production/ios
+node --test tests/*.test.cjs
+plutil -lint BiteLog/Info.plist BiteLog/BiteLog.entitlements
+```
+
+Build on a Mac with Xcode installed:
+
+```bash
+cd /Users/kanika/Documents/Healthapp/BiteLog-v1.2-production
+DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer \
+xcodebuild -project ios/BiteLogHealth.xcodeproj -scheme BiteLog -configuration Debug \
+  -destination generic/platform=iOS -derivedDataPath /tmp/BiteLogDerived \
+  DEVELOPMENT_TEAM=YX8ZU7XXF4 CODE_SIGN_STYLE=Automatic \
+  -allowProvisioningUpdates build
+```
+
+### Exact iPhone test steps
+
+1. Install BiteLog 1.6.4 build 24 and confirm that version in Settings.
+2. Photograph a mixed meal. Tap Estimate from photo and confirm a meal name, calories, protein, confidence, and assumptions appear. Review them, tap Save, and confirm the sheet closes and the meal appears under Meals today and Food Log.
+3. Delete that meal from Food Log and confirm it disappears and the daily totals decrease.
+4. Upload `Kanika Pandey V8.pdf`. Confirm the full meal schedule, weekly rules, recipes, summary, and estimated allowance ranges appear and View original opens the PDF.
+5. Repeat with a clear photo of one plan page. Confirm that visible-page content is extracted and saved without replacing the previous plan if analysis fails.
+6. Record “I ate two eggs, two slices of wholegrain toast, and one small banana.” Confirm the transcript and nutrition are logged. Record an unclear note and confirm nothing is saved.
+7. Record a Journal reflection and confirm it appears only in Journal and in the weekly update.
+8. Sync Apple Health and compare seven-day steps, active calories, and workout minutes with Health.
+9. Build the weekly update and confirm nutrition, plan, Health totals, and Journal reflections are present. Open Email dietitian and review the native draft without sending during the test.
+
+### Proposed commit message
+
+`Fix meal photo and nutrition plan analysis`
+
+## October 25, 2026 — next product priorities recorded
+
+### Completed
+
+- Recorded three agreed priorities in `docs/NEXT_TASKS.md`: a full app design refresh, adaptive weekly guidance when logged intake runs ahead of the dietitian's plan, and a code/data/architecture review.
+- Defined guardrails for the guidance feature: transparent calculations, dietitian-plan minimums, no extreme compensation, and escalation to the dietitian when targets or data are insufficient.
+- Current branch: `main`.
+
+### Files changed
+
+- `docs/NEXT_TASKS.md`
+- `docs/HANDOFF.md`
+
+### Known issues
+
+- These items are documented only; no product behavior or architecture changed.
+- The exact design direction and safe adjustment rules still need product review before implementation.
+
+### Next recommended task
+
+Start with the codebase and data-flow review so the design refresh and adaptive guidance are based on the actual storage and calculation paths.
+
+### Exact run commands
+
+No run commands are required for this documentation-only update.
+
+### Exact test steps
+
+1. Read the new priorities at the top of `docs/NEXT_TASKS.md`.
+2. Confirm the order and scope match the intended roadmap.
+
 ## October 25, 2026 — App Store privacy ready
 
 ### Completed

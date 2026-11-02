@@ -1,5 +1,16 @@
 # Current state / handoff
 
+## November 1, 2026 — meal photo and plan analysis restored (1.6.4 build 24 source)
+
+- Production photo and plan analysis had a shared operational failure: OpenAI returned `401 invalid_api_key` before either analyzer could process its input. The protected Vercel credential was rotated and production was redeployed at `https://bitelog-api.vercel.app`.
+- Meal photos now retain up to 1280px at JPEG quality 0.84. The backend requests high-detail vision and explicitly estimates every visible component, portions, cooking fats, sauces, and toppings before returning the meal name, calories, protein, confidence, description, and assumptions.
+- The server model default was updated from the stale `gpt-5.6-luna` configuration to `gpt-6.1-sol`.
+- Plan PDFs continue to use the Responses API file input and plan images use high-detail vision. Provider credential and quota failures now produce accurate, actionable messages without exposing provider data.
+- Live production checks returned HTTP 200 for health, two supplied food photos, the full five-page `Kanika Pandey V8.pdf`, a rendered image of its first page, a spoken meal, and journal transcription. The PDF preserved the complete schedule and produced estimated allowances because the plan contains no explicit calorie or protein target.
+- All 15 backend tests, the bundled iOS JavaScript behavior/syntax test, plist/entitlement lint, diff validation, and the post-deployment error scan pass.
+- The source is version 1.6.4 build 24. This laptop currently has only Apple Command Line Tools and no full Xcode installation, so build 24 has not been compiled, installed on an iPhone, or uploaded to App Store Connect from this laptop.
+- Apple Health permissions/data, the native Mail composer, camera capture, save/delete presentation, and the visual quality of real iPhone photos still require a manual physical-device pass before submission.
+
 ## What has been proven
 - Physical iPhone detected by Xcode.
 - Developer Mode enabled.

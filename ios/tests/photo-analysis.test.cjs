@@ -3,6 +3,8 @@ const html=fs.readFileSync(require('node:path').join(__dirname,'../BiteLog/Resou
 const declaredIds=new Set([...html.matchAll(/\bid="([^"]+)"/g)].map(match=>match[1]));
 const referencedIds=new Set([...html.matchAll(/\$\('#([^']+)'\)/g)].map(match=>match[1]));
 assert.deepEqual([...referencedIds].filter(id=>!declaredIds.has(id)).sort(),[], 'JavaScript references missing DOM elements');
+assert.match(html,/Math\.min\(1,1280\/Math\.max\(img\.width,img\.height\)\)/,'meal photos retain enough resolution for food analysis');
+assert.match(html,/toDataURL\('image\/jpeg',\.84\)/,'meal photos use the expected JPEG quality');
 // Execute the actual bundled handlers with a minimal DOM and controlled network.
 const nodes={},order=[];
 function $(id){return nodes[id] ||= {

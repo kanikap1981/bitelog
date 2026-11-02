@@ -58,16 +58,20 @@ async def analyze_meal(image_url: str, settings: Settings) -> MealEstimate:
         "model": settings.openai_model,
         "store": False,
         "instructions": (
-            "You estimate food nutrition from a meal photo. Be conservative and transparent. "
-            "Return the likely meal name, total calories, total protein in grams, a confidence from 0 to 1, "
-            "a short description, and concise assumptions about portions or hidden ingredients. "
+            "You estimate food nutrition from a meal photo for an athlete's food log. Inspect every visible food and drink, "
+            "estimate realistic portion sizes, and include likely cooking oil, butter, dressings, sauces, toppings, and other "
+            "calorie-dense ingredients when the photo suggests them. Calculate the total calories and protein for the whole "
+            "visible meal, not for a single component. Do not invent ingredients that are unsupported by the image. Be "
+            "conservative and transparent rather than falsely precise. Return the likely meal name, total calories, total "
+            "protein in grams, a confidence from 0 to 1, a short description naming the visible components, and concise "
+            "assumptions about portions or hidden ingredients. If portion size is unclear, state the assumed serving size. "
             "This is an estimate, not medical advice."
         ),
         "input": [{
             "role": "user",
             "content": [
-                {"type": "input_text", "text": "Estimate this meal from the photo."},
-                {"type": "input_image", "image_url": image_url, "detail": "low"},
+                {"type": "input_text", "text": "Estimate the total calories and protein in this entire meal."},
+                {"type": "input_image", "image_url": image_url, "detail": "high"},
             ],
         }],
         "text": {
@@ -98,7 +102,7 @@ async def analyze_meal(image_url: str, settings: Settings) -> MealEstimate:
         raise MealAnalysisError("The server could not reach the photo analysis service. Please try again.", 503) from exc
 
     logger.info(
-        "meal_provider model=%s detail=low status=%s duration_ms=%d",
+        "meal_provider model=%s detail=high status=%s duration_ms=%d",
         settings.openai_model, response.status_code, (time.monotonic() - started) * 1000,
     )
 
