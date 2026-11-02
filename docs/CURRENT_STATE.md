@@ -1,5 +1,12 @@
 # Current state / handoff
 
+## November 1, 2026 — build 24 reinstalled on Kanika's iPhone
+
+- Rebuilt the clean committed 1.6.4 source as build 24 with the Modern Health development signing profile and HealthKit entitlement.
+- Verified the installable app reports bundle identifier `au.com.themodernhealth.BiteLog`, version `1.6.4`, and build `24`.
+- Installed the app successfully on Kanika's connected iPhone 17 Pro and launched it through `devicectl`.
+- The native launch succeeded. Final feature interaction remains a manual on-phone check.
+
 ## November 1, 2026 — build 24 submitted for external TestFlight review
 
 - BiteLog 1.6.4 build 24 finished App Store Connect processing and was added to the existing external TestFlight group `Amie testing`.

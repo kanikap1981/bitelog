@@ -1070,3 +1070,54 @@ No local command is required. Status is managed in App Store Connect.
 2. Confirm build 24 changes from `Waiting for Review` to `Testing`.
 3. Open `https://testflight.apple.com/join/Pu6yxcTU` and confirm BiteLog is accepting testers.
 4. Ask Amie to open TestFlight, install or update BiteLog to 1.6.4 (24), and confirm the build number.
+
+# November 1, 2026 — build 24 physical-device reinstall
+
+## Completed
+
+- Confirmed Kanika's iPhone 17 Pro was connected.
+- Rebuilt BiteLog 1.6.4 build 24 from the clean committed source with the Modern Health development profile.
+- Verified the generated app's bundle identifier, marketing version, and build number.
+- Installed `au.com.themodernhealth.BiteLog` successfully and launched it on the connected iPhone.
+- Current branch: `main`.
+
+## Files changed
+
+- `docs/CURRENT_STATE.md`
+- `docs/HANDOFF.md`
+
+## Known issues
+
+- Automated tooling verified installation and native launch, but the in-app screens and feature interactions still require a manual check on the physical iPhone.
+- Build 24 remains `Waiting for Review` for external TestFlight distribution.
+
+## Next recommended task
+
+On the iPhone, verify the Settings footer shows BiteLog 1.6.4 build 24, then test one photo meal and one sample-plan upload.
+
+## Exact run commands
+
+```bash
+cd /Users/kanika/Documents/Healthapp/BiteLog-v1.2-production
+DEVELOPER_DIR=/Users/kanika/Downloads/Xcode.app/Contents/Developer xcodebuild \
+  -project ios/BiteLogHealth.xcodeproj -scheme BiteLog -configuration Release \
+  -destination 'id=00008150-0016588A1E23C01C' \
+  -derivedDataPath /private/tmp/BiteLogBuild24Device \
+  -allowProvisioningUpdates build
+
+DEVELOPER_DIR=/Users/kanika/Downloads/Xcode.app/Contents/Developer xcrun devicectl device install app \
+  --device F6C55681-B06F-5583-A7D3-CB0D887F7B56 \
+  /private/tmp/BiteLogBuild24Device/Build/Products/Release-iphoneos/BiteLog.app
+
+DEVELOPER_DIR=/Users/kanika/Downloads/Xcode.app/Contents/Developer xcrun devicectl device process launch \
+  --device F6C55681-B06F-5583-A7D3-CB0D887F7B56 \
+  au.com.themodernhealth.BiteLog
+```
+
+## Exact test steps
+
+1. Open BiteLog on Kanika's iPhone.
+2. Open Settings and confirm `BiteLog 1.6.4 · build 24` appears.
+3. Add a meal from a photo and confirm calories, carbohydrates, protein, confidence, and assumptions appear before saving.
+4. Save the meal and confirm it appears in Today and Food Log.
+5. Upload `BiteLog-App-Review-Sample-Plan.pdf` and confirm its explicit targets are extracted.
