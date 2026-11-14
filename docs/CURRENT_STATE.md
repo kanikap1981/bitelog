@@ -9,6 +9,7 @@
 - The ten reserved tester codes remain the private distribution list previously supplied to Kanika. Their plaintext values are not committed.
 - Automated verification passes: 19 backend unit tests, the bundled iOS JavaScript behavior/syntax test, Python compilation, and diff validation.
 - Live verification passed: `/health` returned OK, a reserved code returned a token for `tester-01` with a 432,000-second lifetime, and a no-token analysis request was not rejected by invite authorization. The app source is still BiteLog 1.6.4 build 24; a new build number, iPhone installation, TestFlight upload, and enforcement activation have not been performed.
+- This no-database stage limits each issued token to five days, but does not make codes single-use. A tester can redeem the same reserved code again until its hash is removed; first-use trials and tester analytics require persistent storage.
 
 ## November 12, 2026 — grams-based photo portions saved locally
 

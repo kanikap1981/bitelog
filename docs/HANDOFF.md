@@ -33,6 +33,7 @@
 - `INVITE_ENFORCEMENT_ENABLED` must remain `false` until the invite-enabled iPhone build is installed, tested, and distributed. Enabling it earlier would block the current TestFlight/App Store build from paid API routes.
 - The app is still version 1.6.4 build 24; no new archive or TestFlight build has been created.
 - Physical-iPhone testing of the invite screen, photo grams flow, and Save behavior is still pending.
+- Tokens expire after five days, but a reserved code can currently be redeemed again because there is no first-use database. True one-time five-day trials require persisting first redemption or manually removing the tester's code hash.
 - A database-backed tester dashboard, per-user scan counts, code revocation, and token-spend reporting remain future work. This release intentionally uses a small server-side reserved-code list.
 
 ### Next recommended task
