@@ -1,5 +1,41 @@
 # BiteLog handoff — November 14, 2026
 
+## November 14, 2026 — build 26 tester rollout prepared
+
+### Completed
+
+- Added Kamal Singh (`Xiiiksingh@gmail.com`) and Chandra Pandey (`Cspandey3000@gmail.com`) to the external TestFlight group `Amie build 26 testing` alongside Amie Cox.
+- Created the replacement public TestFlight link `https://testflight.apple.com/join/BZSrMZsX` with a 30-tester limit.
+- Updated and published the final `https://b8log.com/starter-plan` success screen so testers can continue to BiteLog after downloading their PDF.
+- The new website button is labelled **Continue in BiteLog**, opens the replacement TestFlight link in a new tab, and explains that the downloaded plan should be uploaded in BiteLog.
+- Current branch: `main`.
+
+### Files changed
+
+- `docs/CURRENT_STATE.md`
+- `docs/HANDOFF.md`
+
+### Known issues
+
+- Build 26 remains `Waiting for Review` in external Beta App Review.
+- App Store Connect reports `No Builds Available` for the newly added testers until Apple approves build 26.
+- The public TestFlight link cannot accept testers until the group has an approved build.
+
+### Next recommended task
+
+Monitor build 26 Beta App Review. After approval, verify that Amie, Kamal, and Chandra can install or update through TestFlight and that the public link accepts testers. Do not change the in-flight public App Store submission.
+
+### Exact verification steps
+
+1. Open `https://testflight.apple.com/join/BZSrMZsX` after Apple approves build 26 and confirm it offers BiteLog.
+2. Ask Amie, Kamal, and Chandra to open TestFlight and install or update build 26.
+3. Open `https://b8log.com/starter-plan`, generate and download a starter plan, and confirm the final screen shows **Continue in BiteLog**.
+4. Confirm the button opens the replacement TestFlight link in a new tab.
+
+### Proposed commit message
+
+`Document build 26 tester rollout`
+
 ## November 14, 2026 — build 26 uploaded for fresh TestFlight testing
 
 ### Completed

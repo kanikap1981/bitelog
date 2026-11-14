@@ -9,7 +9,9 @@
 - The Plan upload screen now promotes **Analyze and Save Plan** as the primary green action after a document is selected, while the selected-file control becomes subdued.
 - The updated backend is live at `https://bitelog-api.vercel.app`, with invite-only enforcement active. The new manual-estimate route is protected by the same invite token as the other AI routes.
 - Verification passes: 20 backend tests, the bundled iOS behavior/syntax test, Python compilation, plist validation, and diff validation.
-- The replacement external group is `Amie build 26 testing`. It contains build 26 and Amie Cox (`amiestargetnutrition@gmail.com`). Its tester instructions begin at `https://b8log.com/starter-plan` and cover plan generation, PDF upload, meal tracking, and the weekly email update.
+- The replacement external group is `Amie build 26 testing`. It contains build 26 plus Amie Cox (`amiestargetnutrition@gmail.com`), Kamal Singh (`Xiiiksingh@gmail.com`), and Chandra Pandey (`Cspandey3000@gmail.com`). Its tester instructions begin at `https://b8log.com/starter-plan` and cover plan generation, PDF upload, meal tracking, and the weekly email update.
+- The replacement public TestFlight link is `https://testflight.apple.com/join/BZSrMZsX` with a 30-tester limit. Apple will not accept public-link testers until build 26 passes external Beta App Review.
+- The published starter-plan success screen now keeps the PDF download and adds **Continue in BiteLog**, which opens the replacement TestFlight link and tells the tester to upload the downloaded plan in BiteLog.
 - The old `Amie testing` group and its public link were removed after the replacement was verified. Amie's tester record remains active in the new group; the two anonymous public-link testers were intentionally not moved.
 
 ## November 14, 2026 — invite-only build 25 ready for manual iPhone testing
