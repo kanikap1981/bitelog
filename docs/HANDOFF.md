@@ -1,4 +1,65 @@
-# BiteLog handoff — October 17, 2026
+# BiteLog handoff — November 12, 2026
+
+## November 12, 2026 — optional meal grams and reliable photo-meal saving
+
+### Completed
+
+- Added an optional **Amount you’ll eat (g)** field after photo analysis. The backend now estimates the total photographed meal weight and the app scales calories, carbohydrates, and protein from that baseline as the athlete enters grams.
+- Saved the chosen gram amount with the meal and displayed it in Meals today and Food Log.
+- Replaced full-resolution Base64 photo persistence with a small 240px thumbnail. This prevents repeated scans from exhausting WKWebView local storage.
+- Made Save transactional: it disables during the write, verifies the new meal exists in persisted storage, closes only after verification, and rolls back the in-memory meal if persistence fails.
+- Added recovery for older oversized stored meal photos. If storage is full, BiteLog removes only legacy oversized thumbnails while retaining their meal records, retries, and then falls back to saving the new meal without a thumbnail.
+- Added a clear in-sheet error when a meal cannot be saved.
+- Passed all 15 backend tests, the bundled iOS JavaScript behavior/syntax test, Python compilation, and `git diff --check`.
+- Current branch: `main`.
+
+### Files changed
+
+- `backend/app/main.py`
+- `backend/app/schemas.py`
+- `backend/app/services/openai_meal_analyzer.py`
+- `backend/tests/test_photo_analysis.py`
+- `ios/BiteLog/Resources/index.html`
+- `ios/tests/photo-analysis.test.cjs`
+- `docs/CURRENT_STATE.md`
+- `docs/HANDOFF.md`
+
+### Known issues
+
+- Physical-iPhone interaction testing was deliberately deferred at Kanika’s request.
+- The production backend has not been deployed with `estimated_weight_grams`, so the grams control will not appear in a distributed app until the backend and a new iOS build are released together.
+- The source remains BiteLog 1.6.4 build 24. A new build number has not been assigned.
+- Meal weight and nutrition remain visual estimates and must be confirmed by the athlete.
+
+### Next recommended task
+
+Deploy the updated backend, create the next iOS build, install it on Kanika’s iPhone, and test photo analysis → optional grams → Save → sheet closes → meal appears once with adjusted nutrition. Do not begin the deferred visual redesign until this flow passes on-device.
+
+### Exact run commands
+
+```bash
+cd /Users/kanika/Documents/Healthapp/BiteLog-v1.2-production
+python3 -m venv /tmp/bitelog-test-venv
+/tmp/bitelog-test-venv/bin/pip install -r backend/requirements.txt
+PYTHONPATH=backend /tmp/bitelog-test-venv/bin/python -m unittest discover -s backend/tests -v
+node ios/tests/photo-analysis.test.cjs
+PYTHONPYCACHEPREFIX=/tmp/bitelog-pycache python3 -m compileall -q backend/app backend/tests
+git diff --check
+```
+
+### Exact test steps
+
+1. Open Add meal, take or select a clear meal photo, and tap **Estimate from photo**.
+2. Confirm the full-photo estimate shows calories, carbohydrates, protein, confidence, assumptions, and estimated total grams.
+3. Leave **Amount you’ll eat (g)** blank and confirm the full-meal nutrition remains unchanged.
+4. Enter half the estimated grams and confirm calories, carbohydrates, and protein scale to approximately half.
+5. Tap **Save meal** once. Confirm the sheet closes, Today opens, and exactly one meal appears with the chosen grams and adjusted nutrition.
+6. Open Food Log and confirm the same meal and grams are present after relaunching BiteLog.
+7. Repeat several photo saves to confirm storage remains reliable; delete a meal and confirm it disappears.
+
+### Proposed commit message
+
+`Add portion scaling and reliable meal saving`
 
 ## November 1, 2026 — BiteLog 1.6.4 submitted to App Review
 

@@ -1,5 +1,15 @@
 # Current state / handoff
 
+## November 12, 2026 — grams-based photo portions saved locally
+
+- Photo analysis now includes an estimated total photographed weight in grams in addition to meal name, calories, carbohydrates, protein, confidence, description, and assumptions.
+- After a photo estimate, athletes may optionally enter the number of grams they expect to eat. BiteLog scales all three nutrition values from the estimated full-meal weight, while leaving the fields editable for confirmation.
+- Saved meals retain the selected gram amount and show it in Today and Food Log.
+- Photo-meal persistence is now transactional and verified before the sheet closes. A failed write is rolled back and produces a visible error instead of increasing in-memory totals without a durable meal.
+- Only a 240px thumbnail is stored with a meal rather than the full analysis image. On quota pressure, BiteLog removes legacy oversized meal thumbnails while preserving the meal records, then retries.
+- Automated verification passes: 15 backend unit tests, the bundled JavaScript behavior/syntax test, Python compilation, and diff validation.
+- iPhone testing, production backend deployment, build-number increment, TestFlight/App Store upload, and the deferred visual redesign have not been performed for this change.
+
 ## November 1, 2026 — App Store resubmission waiting for review
 
 - BiteLog 1.6.4 build 24 is submitted for public App Review under submission `bb77318b-a96e-461e-9a00-0479b149e3c3`; Apple reports `Waiting for Review`.

@@ -11,8 +11,8 @@ from fastapi.responses import JSONResponse
 from app.config import Settings, get_settings
 from app.schemas import (
     InlineMealAnalysisRequest,
-    MealEstimate,
     ObjectMealAnalysisRequest,
+    PhotoMealEstimate,
     PlanAnalysisRequest,
     PlanEstimate,
     PresignRequest,
@@ -100,7 +100,7 @@ def _decode_inline_audio(data_url: str) -> tuple[bytes, str, str]:
     return raw, f"audio/{subtype}", extension
 
 
-@app.post("/v1/meals/analyze-inline", response_model=MealEstimate)
+@app.post("/v1/meals/analyze-inline", response_model=PhotoMealEstimate)
 async def analyze_inline(
     body: InlineMealAnalysisRequest,
     settings: Settings = Depends(get_settings),
@@ -113,7 +113,7 @@ async def analyze_inline(
     return await analyze_meal(body.image_data_url, settings)
 
 
-@app.post("/v1/meals/analyze", response_model=MealEstimate)
+@app.post("/v1/meals/analyze", response_model=PhotoMealEstimate)
 async def analyze_object(
     body: ObjectMealAnalysisRequest,
     settings: Settings = Depends(get_settings),

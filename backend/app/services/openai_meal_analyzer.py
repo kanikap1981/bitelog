@@ -7,7 +7,7 @@ from typing import Any
 import httpx
 
 from app.config import Settings
-from app.schemas import MealEstimate
+from app.schemas import PhotoMealEstimate
 
 
 MEAL_SCHEMA = {
@@ -17,11 +17,12 @@ MEAL_SCHEMA = {
         "calories": {"type": "integer", "minimum": 0, "maximum": 10000},
         "carbs": {"type": "number", "minimum": 0, "maximum": 2000},
         "protein": {"type": "number", "minimum": 0, "maximum": 1000},
+        "estimated_weight_grams": {"type": "integer", "minimum": 1, "maximum": 10000},
         "confidence": {"type": "number", "minimum": 0, "maximum": 1},
         "description": {"type": "string"},
         "assumptions": {"type": "array", "items": {"type": "string"}},
     },
-    "required": ["name", "calories", "carbs", "protein", "confidence", "description", "assumptions"],
+    "required": ["name", "calories", "carbs", "protein", "estimated_weight_grams", "confidence", "description", "assumptions"],
     "additionalProperties": False,
 }
 
@@ -51,7 +52,7 @@ def _find_output_text(payload: dict[str, Any]) -> str:
     raise MealAnalysisError("Model returned no structured meal estimate")
 
 
-async def analyze_meal(image_url: str, settings: Settings) -> MealEstimate:
+async def analyze_meal(image_url: str, settings: Settings) -> PhotoMealEstimate:
     if not settings.openai_api_key.strip() or settings.openai_api_key == "replace_me":
         raise MealAnalysisError("Photo analysis is not configured on the server. Set OPENAI_API_KEY on the backend.", 503)
 
@@ -65,7 +66,8 @@ async def analyze_meal(image_url: str, settings: Settings) -> MealEstimate:
             "visible meal, not for a single component. Estimate total carbohydrate and protein in grams. Do not invent "
             "ingredients that are unsupported by the image. Be "
             "conservative and transparent rather than falsely precise. Return the likely meal name, total calories, total "
-            "carbohydrate and protein in grams, a confidence from 0 to 1, a short description naming the visible components, and concise "
+            "carbohydrate and protein in grams, the estimated total weight in grams of the whole visible meal, a confidence from 0 to 1, "
+            "a short description naming the visible components, and concise "
             "assumptions about portions or hidden ingredients. If portion size is unclear, state the assumed serving size. "
             "This is an estimate, not medical advice."
         ),
@@ -119,6 +121,6 @@ async def analyze_meal(image_url: str, settings: Settings) -> MealEstimate:
 
     try:
         text = _find_output_text(response.json())
-        return MealEstimate.model_validate(json.loads(text))
+        return PhotoMealEstimate.model_validate(json.loads(text))
     except (ValueError, TypeError, AttributeError) as exc:
         raise MealAnalysisError("Photo analysis returned an invalid estimate. Please try again.") from exc

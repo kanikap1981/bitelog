@@ -25,6 +25,10 @@ class MealEstimate(BaseModel):
     assumptions: list[str] = Field(default_factory=list)
 
 
+class PhotoMealEstimate(MealEstimate):
+    estimated_weight_grams: int = Field(ge=1, le=10000)
+
+
 class VoiceMealEstimate(MealEstimate):
     transcript: str = Field(min_length=1)
 

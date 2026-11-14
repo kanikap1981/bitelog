@@ -10,7 +10,7 @@ from app.config import Settings, get_settings
 
 # Valid 64x64 PNG: route fixture only, not a nutrition accuracy fixture.
 PHOTO = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAIAAAAlC+aJAAAAeklEQVR4nO3PUQkAIBTAwBfVKEYxqiH8OITBAtxmn/V1wwUNaEEDWtCAFjSgBQ1oQQNa0IAWNKAFDWhBA1rQgBY0oAUNaEEDWtCAFjSgBQ1oQQNa0IAWNKAFDWhBA1rQgBY0oAUNaEEDWtCAFjSgBQ1oQQNa0IAWPHYBH1wBaXB16TcAAAAASUVORK5CYII='
-ESTIMATE = dict(name='Eggs and toast', calories=420, carbs=34.0, protein=23.5,
+ESTIMATE = dict(name='Eggs and toast', calories=420, carbs=34.0, protein=23.5, estimated_weight_grams=310,
                 confidence=0.7, description='A small plate', assumptions=['Two eggs'])
 
 
