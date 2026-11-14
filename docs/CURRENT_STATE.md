@@ -1,5 +1,15 @@
 # Current state / handoff
 
+## November 14, 2026 — invite-only build 25 ready for manual iPhone testing
+
+- BiteLog is now version 1.6.5 build 25. The signed Debug build was installed successfully on Kanika's connected iPhone 17 Pro.
+- Production invite enforcement is active at `https://bitelog-api.vercel.app`. A request without a valid BiteLog access token now returns HTTP 401 before an AI provider call, preventing unauthorised scan spend.
+- The invite gate remains server-validated. The app contains no plaintext invite codes and stores only the signed five-day access token and its expiry.
+- The existing meal-save correction remains intact: Save persists and verifies the meal before closing the sheet, retries without oversized image data when needed, and rolls back with a visible error when storage fails.
+- Verification passed: 19 backend tests, the iOS behavior/syntax suite, a signed device build, production `/health`, and a live unauthorised analysis check.
+- The app could not be opened remotely after installation because the iPhone was locked. Kanika must now perform the short manual pass: invite code, photo estimate, optional grams, Save, persistence after relaunch, and deletion.
+- Invite codes are reusable during this database-free stage. Tokens expire after five days; true single-use codes and tester analytics still require persistent storage.
+
 ## November 14, 2026 — staged invite-only access implemented
 
 - The backend now redeems private invite codes at `POST /v1/invites/redeem` and issues signed access tokens that expire after five days.

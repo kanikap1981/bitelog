@@ -1,5 +1,70 @@
 # BiteLog handoff — November 14, 2026
 
+## November 14, 2026 — build 25 installed and production made invite-only
+
+### Completed
+
+- Confirmed `main` was clean and exactly aligned with `origin/main` before work.
+- Promoted the iOS app to BiteLog 1.6.5 build 25 and updated its visible version label.
+- Built and signed build 25 with the Modern Health team and HealthKit entitlement, then installed it on Kanika's connected iPhone 17 Pro.
+- Changed production `INVITE_ENFORCEMENT_ENABLED` from `false` to `true` and deployed the existing backend to `https://bitelog-api.vercel.app`.
+- Verified `/health` returns HTTP 200 and an unauthorised meal analysis returns HTTP 401 before any AI call.
+- Re-ran all 19 backend tests and the iOS behavior/syntax test. The iOS suite covers authorization wiring, photo and voice analysis, optional grams, verified meal persistence, rollback on storage failure, sheet dismissal, deletion, settings save/close, and weekly Health data.
+- Current branch: `main`.
+
+### Files changed
+
+- `ios/BiteLogHealth.xcodeproj/project.pbxproj`
+- `ios/BiteLog/Info.plist`
+- `ios/BiteLog/Resources/index.html`
+- `docs/CURRENT_STATE.md`
+- `docs/HANDOFF.md`
+
+### Known issues
+
+- The installed app could not be launched remotely because the iPhone was locked. Unlock it and open BiteLog manually.
+- The final physical interaction pass is pending: valid invite, real photo estimate, optional grams, Save closes the sheet, meal survives relaunch, and delete removes it.
+- Reserved codes are not single-use without a database. A code can be redeemed again and will issue another five-day token until its hash is removed.
+- Build 25 has not been uploaded to TestFlight. Manual device approval comes first.
+
+### Next recommended task
+
+Complete the five-minute on-device test below. If it passes, archive build 25 and upload it to TestFlight for Amie.
+
+### Exact run commands
+
+```bash
+cd /Users/kanika/Documents/Healthapp/BiteLog-v1.2-production/backend
+/Users/kanika/Documents/Healthapp/BiteLogproduction/backend/.venv/bin/python -m unittest discover -s tests -v
+
+cd /Users/kanika/Documents/Healthapp/BiteLog-v1.2-production
+node ios/tests/photo-analysis.test.cjs
+DEVELOPER_DIR=/Users/kanika/Downloads/Xcode.app/Contents/Developer xcodebuild -project ios/BiteLogHealth.xcodeproj -scheme BiteLog -configuration Debug -destination 'generic/platform=iOS' -derivedDataPath /private/tmp/BiteLogBuild25Device DEVELOPMENT_TEAM=YX8ZU7XXF4 CODE_SIGN_STYLE=Automatic -allowProvisioningUpdates build
+DEVELOPER_DIR=/Users/kanika/Downloads/Xcode.app/Contents/Developer xcrun devicectl device install app --device F6C55681-B06F-5583-A7D3-CB0D887F7B56 /private/tmp/BiteLogBuild25Device/Build/Products/Debug-iphoneos/BiteLog.app
+```
+
+Run the backend locally if needed:
+
+```bash
+cd /Users/kanika/Documents/Healthapp/BiteLog-v1.2-production/backend
+source /Users/kanika/Documents/Healthapp/BiteLogproduction/backend/.venv/bin/activate
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+```
+
+### Exact manual test steps
+
+1. Unlock the iPhone and open BiteLog. Confirm **Your BiteLog Diet Program** appears first.
+2. Enter an invalid code and confirm BiteLog stays on the invite screen with a clear error.
+3. Enter one of Kanika's reserved private codes and complete the profile if prompted.
+4. Add a meal photo and tap **Estimate from photo**. Confirm calories, carbohydrates, protein, confidence, assumptions, and optional grams appear.
+5. Optionally enter grams, tap **Save meal**, and confirm the sheet closes and exactly one meal appears in Today and Food Log.
+6. Force-close and reopen BiteLog. Confirm the meal is still present.
+7. Delete that meal from Food Log and confirm it disappears from both Food Log and Today's totals.
+
+### Proposed commit message
+
+`Prepare invite-only BiteLog build 25`
+
 ## November 14, 2026 — staged invite-only access
 
 ### Completed
