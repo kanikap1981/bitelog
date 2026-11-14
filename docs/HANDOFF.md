@@ -1,4 +1,75 @@
-# BiteLog handoff — November 12, 2026
+# BiteLog handoff — November 14, 2026
+
+## November 14, 2026 — staged invite-only access
+
+### Completed
+
+- Added server-side invite-code redemption with SHA-256 code hashes and five-day HMAC-signed access tokens.
+- Added optional authorization enforcement to every paid analysis/upload route. The default and current Vercel production value remain `false`, so build 24 and Amie are not interrupted.
+- Added the invite-code screen before iPhone profile onboarding. The app sends codes only to the backend, stores only the returned token and expiry, and adds the Bearer token to photo, voice, journal, plan, object-analysis, and upload requests.
+- Added expiry handling that clears invalid access and reopens the invite screen with a clear message.
+- Added the four production Vercel settings. Code hashes and the token-signing key are non-revealable Secrets; TTL and enforcement are Config values. Vercel reports that a new deployment is required.
+- Passed 19 backend unit tests, the iOS JavaScript behavior/syntax test, Python compilation, and `git diff --check`.
+- Current branch: `main`.
+
+### Files changed
+
+- `backend/.env.example`
+- `backend/README.md`
+- `backend/app/config.py`
+- `backend/app/main.py`
+- `backend/app/schemas.py`
+- `backend/app/services/invite_access.py`
+- `backend/tests/test_invite_access.py`
+- `ios/BiteLog/Resources/index.html`
+- `ios/tests/photo-analysis.test.cjs`
+- `docs/CURRENT_STATE.md`
+- `docs/HANDOFF.md`
+
+### Known issues
+
+- `INVITE_ENFORCEMENT_ENABLED` must remain `false` until the invite-enabled iPhone build is installed, tested, and distributed. Enabling it earlier would block the current TestFlight/App Store build from paid API routes.
+- The production deployment has not yet been refreshed with this code and the new environment values.
+- The app is still version 1.6.4 build 24; no new archive or TestFlight build has been created.
+- The first production deployment should test one reserved code and confirm existing no-token clients still work before any iPhone distribution work.
+- A database-backed tester dashboard, per-user scan counts, code revocation, and token-spend reporting remain future work. This release intentionally uses a small server-side reserved-code list.
+
+### Next recommended task
+
+Push `main`, allow Vercel to deploy with enforcement off, verify `/health` and `/v1/invites/redeem`, then create the next iOS build and test invite code → profile → photo scan → optional grams → Save on Kanika’s iPhone. Only after the updated TestFlight build reaches testers should enforcement be changed to `true` and redeployed.
+
+### Exact run commands
+
+```bash
+cd /Users/kanika/Documents/Healthapp/BiteLog-v1.2-production
+PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=backend /tmp/bitelog-test-venv/bin/python -m unittest discover -s backend/tests -v
+node ios/tests/photo-analysis.test.cjs
+PYTHONPYCACHEPREFIX=/tmp/bitelog-pycache python3 -m compileall -q backend/app backend/tests
+git diff --check
+```
+
+Run the backend locally with invite settings from a private, gitignored environment file:
+
+```bash
+cd /Users/kanika/Documents/Healthapp/BiteLog-v1.2-production/backend
+source /tmp/bitelog-test-venv/bin/activate
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+```
+
+### Exact test steps
+
+1. Launch the updated app and confirm **Your BiteLog Diet Program** appears before profile onboarding.
+2. Enter an invalid code and confirm the app stays on the screen with a clear error.
+3. Enter one reserved code and confirm the profile screen opens.
+4. Complete the profile and analyze one photo. Confirm calories, carbohydrates, protein, confidence, assumptions, and optional grams appear.
+5. Save the meal and confirm the sheet closes and exactly one meal appears in Today and Food Log.
+6. Analyze a plan PDF or image and confirm its targets and schedule are saved.
+7. With production enforcement still off, verify the current build 24 can still analyze a photo.
+8. Do not enable enforcement until the new build is available to Amie and other testers.
+
+### Proposed commit message
+
+`Add staged invite access protection`
 
 ## November 12, 2026 — optional meal grams and reliable photo-meal saving
 

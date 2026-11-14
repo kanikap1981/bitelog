@@ -37,6 +37,17 @@ class VoiceTranscription(BaseModel):
     transcript: str = Field(min_length=1)
 
 
+class InviteRedeemRequest(BaseModel):
+    code: str = Field(min_length=8, max_length=64)
+
+
+class InviteRedeemResponse(BaseModel):
+    access_token: str = Field(min_length=32)
+    token_type: str = "bearer"
+    expires_in_seconds: int = Field(gt=0)
+    invite_id: str = Field(min_length=1)
+
+
 class PlanAnalysisRequest(BaseModel):
     filename: str = Field(min_length=1, max_length=180)
     content_type: str = Field(min_length=1, max_length=100)

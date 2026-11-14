@@ -5,6 +5,10 @@ const referencedIds=new Set([...html.matchAll(/\$\('#([^']+)'\)/g)].map(match=>m
 assert.deepEqual([...referencedIds].filter(id=>!declaredIds.has(id)).sort(),[], 'JavaScript references missing DOM elements');
 assert.match(html,/Math\.min\(1,1280\/Math\.max\(img\.width,img\.height\)\)/,'meal photos retain enough resolution for food analysis');
 assert.match(html,/toDataURL\('image\/jpeg',\.84\)/,'meal photos use the expected JPEG quality');
+assert.match(html,/id="inviteDialog"/,'invite access is required before onboarding');
+assert.match(html,/\/v1\/invites\/redeem/,'invite codes are redeemed by the backend');
+assert.match(html,/headers:apiHeaders\(\)/,'protected API requests use shared authorization headers');
+assert.doesNotMatch(html,/BITE-[A-F0-9]{4}-[A-F0-9]{4}/,'reserved invite codes are never bundled in the app');
 // Execute the actual bundled handlers with a minimal DOM and controlled network.
 const nodes={},order=[];
 function $(id){return nodes[id] ||= {
@@ -15,7 +19,8 @@ function $(id){return nodes[id] ||= {
  addEventListener(name,fn){this.handlers[name]=fn},click(){return this.handlers.click?.()},scrollIntoView(){order.push('scrollIntoView')},setAttribute(name,value){this.attributes[name]=value}
 }}
 class FileReader{readAsDataURL(){this.result='data:audio/mp4;base64,dGVzdA==';this.onload()}}
-const context={$,URL,AbortController,TypeError,Blob,FileReader,console,setTimeout,clearTimeout,alert(){},today:()=> '2026-09-20',document:{querySelector(selector){if(selector==='meta[name=\"bitelog-api-base\"]')return{content:'http://192.168.1.2:8000'};return $(selector)}},window:{scrollTo(){order.push('scroll')}},photoData:'data:image/jpeg;base64,test',photoThumbnailData:'data:image/jpeg;base64,thumb',photoEstimate:null,photoVersion:0,analysisController:null,state:{apiBaseURL:'http://192.168.1.2:8000'},fetch:null};
+const testAccessToken='signed-invite-token-for-bitelog-tests';
+const context={$,URL,AbortController,TypeError,Blob,FileReader,console,setTimeout,clearTimeout,alert(){},today:()=> '2026-09-20',document:{querySelector(selector){if(selector==='meta[name=\"bitelog-api-base\"]')return{content:'http://192.168.1.2:8000'};return $(selector)}},window:{scrollTo(){order.push('scroll')}},photoData:'data:image/jpeg;base64,test',photoThumbnailData:'data:image/jpeg;base64,thumb',photoEstimate:null,photoVersion:0,analysisController:null,state:{apiBaseURL:'http://192.168.1.2:8000',inviteAccess:{token:testAccessToken,expiresAt:Date.now()+60000}},fetch:null};
 vm.createContext(context);
 const script=html.match(/<script>([\s\S]*?)<\/script>/)[1];
 new vm.Script(script); // Syntax-check the complete app too.
@@ -33,7 +38,7 @@ const click=()=>$('#estimateMeal').handlers.click();
  assert.equal(context.normalizeAPIURL(' http://192.168.1.2:8000/v1/meals/analyze-inline/ '),'http://192.168.1.2:8000');
  assert.throws(()=>context.checkedAPIURL('http://localhost:8000'),/Wi-Fi/);
  assert.throws(()=>context.checkedAPIURL('https://user:secret@example.com'),/credentials/);
- context.fetch=async(url,options)=>{assert.equal(url,'http://192.168.1.2:8000/v1/meals/analyze-inline');assert.equal(JSON.parse(options.body).image_data_url,context.photoData);return response(estimate)};
+ context.fetch=async(url,options)=>{assert.equal(url,'http://192.168.1.2:8000/v1/meals/analyze-inline');assert.equal(options.headers.Authorization,'Bearer '+testAccessToken);assert.equal(JSON.parse(options.body).image_data_url,context.photoData);return response(estimate)};
  await click();assert.equal($('#name').value,'Eggs');assert.equal($('#carbs').value,34);assert.equal($('#protein').value,23.5);assert.equal($('#portionField').hidden,false);assert.match($('#portionHint').textContent,/500g/);assert.match($('#aiHint').textContent,/Two eggs/);assert.match($('#estimateValues').textContent,/34g carbs/);assert.match($('#estimateValues').textContent,/80%/);
  $('#portionGrams').value='250';$('#portionGrams').handlers.input();assert.equal($('#calories').value,200);assert.equal($('#carbs').value,17);assert.equal($('#protein').value,11.8);
  context.fetch=async()=>response({});await click();assert.match($('#aiHint').textContent,/invalid meal estimate/);assert.equal($('#name').value,'Eggs');
@@ -53,6 +58,7 @@ const click=()=>$('#estimateMeal').handlers.click();
  context.saveSettings();
  assert.equal(JSON.stringify(context.state),JSON.stringify({targetCalories:2500,targetProtein:150,profile:{athleteName:'Alex',dietitianName:'Jordan',dietitianEmail:'jordan@example.com'},apiBaseURL:'http://192.168.1.2:8000'}));
  assert.equal($('#settingsDialog').hidden,true);assert.equal($('#settingsDialog').classList.contains('open'),false);assert.equal($('#settingsDialog').style.display,'none');assert.equal($('#settingsDialog').style.displayPriority,'important');assert.deepEqual(order,['persist','close','render']);
+ context.fetch=async(url,options)=>{assert.equal(url,'http://192.168.1.2:8000/v1/invites/redeem');assert.equal(JSON.parse(options.body).code,'BITE-TEST-0001');return response({access_token:testAccessToken,expires_in_seconds:432000,invite_id:'tester-01'})};$('#inviteCode').value='bite-test-0001';await context.redeemInvite();assert.equal(context.state.inviteAccess.token,testAccessToken);assert.equal(context.state.inviteAccess.inviteId,'tester-01');assert.ok(context.state.inviteAccess.expiresAt>Date.now());assert.equal($('#inviteDialog').hidden,true);
  context.state.apiBaseURL='http://192.168.1.2:8000';order.length=0;
  context.fetch=async(url,options)=>{assert.equal(url,'http://192.168.1.2:8000/v1/meals/analyze-voice');assert.match(JSON.parse(options.body).audio_data_url,/^data:audio\/mp4;base64,/);return response({...estimate,transcript:'I had two eggs and toast'})};
  await context.logVoiceMeal(new Blob(['test'],{type:'audio/mp4'}));

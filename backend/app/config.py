@@ -16,6 +16,10 @@ class Settings(BaseSettings):
     openai_model: str = "gpt-6.1-sol"
     database_url: str = "postgresql://bitelog:bitelog@localhost:5432/bitelog"
     redis_url: str = "redis://localhost:6379/0"
+    invite_code_hashes: str = ""
+    invite_token_secret: str = ""
+    invite_token_ttl_seconds: int = 432000
+    invite_enforcement_enabled: bool = False
 
     # Optional S3-compatible storage settings. Python 3.9-compatible typing.
     s3_endpoint_url: Optional[str] = None

@@ -3,6 +3,7 @@ import logging
 import re
 import time
 import uuid
+from typing import Optional
 
 from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -11,6 +12,8 @@ from fastapi.responses import JSONResponse
 from app.config import Settings, get_settings
 from app.schemas import (
     InlineMealAnalysisRequest,
+    InviteRedeemRequest,
+    InviteRedeemResponse,
     ObjectMealAnalysisRequest,
     PhotoMealEstimate,
     PlanAnalysisRequest,
@@ -24,6 +27,7 @@ from app.schemas import (
 from app.services.openai_meal_analyzer import MealAnalysisError, analyze_meal
 from app.services.openai_plan_analyzer import analyze_plan
 from app.services.openai_voice_meal_analyzer import analyze_voice_meal, transcribe_audio
+from app.services.invite_access import redeem_invite_code, require_invite_access
 from app.services.storage import presign_upload
 
 app = FastAPI(title="BiteLog API", version="1.5.0")
@@ -58,6 +62,19 @@ async def meal_analysis_error_handler(_: Request, exc: MealAnalysisError):
 @app.get("/health")
 async def health():
     return {"status": "ok", "service": "bitelog-api", "version": "1.5.0"}
+
+
+@app.post("/v1/invites/redeem", response_model=InviteRedeemResponse)
+async def redeem_invite(
+    body: InviteRedeemRequest,
+    settings: Settings = Depends(get_settings),
+):
+    token, invite_id = redeem_invite_code(body.code, settings)
+    return InviteRedeemResponse(
+        access_token=token,
+        expires_in_seconds=settings.invite_token_ttl_seconds,
+        invite_id=invite_id,
+    )
 
 
 def _validate_inline_image(data_url: str, settings: Settings) -> None:
@@ -103,6 +120,7 @@ def _decode_inline_audio(data_url: str) -> tuple[bytes, str, str]:
 @app.post("/v1/meals/analyze-inline", response_model=PhotoMealEstimate)
 async def analyze_inline(
     body: InlineMealAnalysisRequest,
+    _invite_id: Optional[str] = Depends(require_invite_access),
     settings: Settings = Depends(get_settings),
 ):
     """MVP/mobile-compatible path. The API key stays server-side.
@@ -116,6 +134,7 @@ async def analyze_inline(
 @app.post("/v1/meals/analyze", response_model=PhotoMealEstimate)
 async def analyze_object(
     body: ObjectMealAnalysisRequest,
+    _invite_id: Optional[str] = Depends(require_invite_access),
     settings: Settings = Depends(get_settings),
 ):
     return await analyze_meal(str(body.image_url), settings)
@@ -124,6 +143,7 @@ async def analyze_object(
 @app.post("/v1/meals/analyze-voice", response_model=VoiceMealEstimate)
 async def analyze_voice(
     body: VoiceMealAnalysisRequest,
+    _invite_id: Optional[str] = Depends(require_invite_access),
     settings: Settings = Depends(get_settings),
 ):
     """Transcribe a short meal note and estimate nutrition server-side."""
@@ -134,6 +154,7 @@ async def analyze_voice(
 @app.post("/v1/voice/transcribe", response_model=VoiceTranscription)
 async def transcribe_voice(
     body: VoiceMealAnalysisRequest,
+    _invite_id: Optional[str] = Depends(require_invite_access),
     settings: Settings = Depends(get_settings),
 ):
     """Transcribe a journal reflection without treating it as food."""
@@ -144,6 +165,7 @@ async def transcribe_voice(
 @app.post("/v1/plans/analyze", response_model=PlanEstimate)
 async def analyze_baseline_plan(
     body: PlanAnalysisRequest,
+    _invite_id: Optional[str] = Depends(require_invite_access),
     settings: Settings = Depends(get_settings),
 ):
     """Extract daily and weekly nutrition targets while keeping the API key server-side."""
@@ -153,6 +175,7 @@ async def analyze_baseline_plan(
 @app.post("/v1/uploads/presign", response_model=PresignResponse)
 async def create_presigned_upload(
     body: PresignRequest,
+    _invite_id: Optional[str] = Depends(require_invite_access),
     settings: Settings = Depends(get_settings),
 ):
     try:

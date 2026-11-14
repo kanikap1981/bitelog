@@ -19,6 +19,8 @@ The production API is deployed at `https://bitelog-api.vercel.app`. BiteLog 1.6.
 
 The Vercel project root is this `backend` directory. `app/main.py` is the FastAPI entrypoint and `vercel.json` configures the function duration. Production requires `OPENAI_API_KEY`, `OPENAI_MODEL`, `APP_ENV`, and `MAX_INLINE_IMAGE_BYTES` in Vercel's protected environment settings.
 
+Invite-only rollout also uses `INVITE_CODE_HASHES`, `INVITE_TOKEN_SECRET`, `INVITE_TOKEN_TTL_SECONDS`, and `INVITE_ENFORCEMENT_ENABLED`. Keep enforcement `false` until the invite-enabled mobile build is distributed. Never commit plaintext invite codes or the token secret.
+
 ```bash
 cd backend
 vercel deploy --prod
@@ -27,6 +29,7 @@ curl https://bitelog-api.vercel.app/health
 
 ## Endpoints
 - `GET /health`
+- `POST /v1/invites/redeem` — exchange a reserved invite code for a five-day signed access token
 - `POST /v1/meals/analyze-inline` — current mobile-compatible photo analysis
 - `POST /v1/meals/analyze-voice` — transcribe a meal note and estimate nutrition
 - `POST /v1/voice/transcribe` — transcribe a journal reflection without logging food
