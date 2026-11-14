@@ -5,10 +5,10 @@
 - The backend now redeems private invite codes at `POST /v1/invites/redeem` and issues signed access tokens that expire after five days.
 - Photo analysis, spoken-meal analysis, journal transcription, plan analysis, object analysis, and upload presigning can require the signed token. Enforcement is deliberately **off** until an invite-enabled iPhone build has passed device testing and reached testers.
 - The iPhone app now shows **Your BiteLog Diet Program** before profile onboarding, redeems the code server-side, stores only the signed token and expiry, and sends the token with AI and upload requests. No plaintext invite codes are bundled in the app.
-- Vercel production has `INVITE_CODE_HASHES` and `INVITE_TOKEN_SECRET` stored as non-revealable secrets, plus a five-day TTL and `INVITE_ENFORCEMENT_ENABLED=false`. A new deployment is required for those variables and the new route to take effect.
+- Vercel production has `INVITE_CODE_HASHES` and `INVITE_TOKEN_SECRET` stored as non-revealable secrets, plus a five-day TTL and `INVITE_ENFORCEMENT_ENABLED=false`. Commit `8a0f43a` deployed successfully and is live at `https://bitelog-api.vercel.app`.
 - The ten reserved tester codes remain the private distribution list previously supplied to Kanika. Their plaintext values are not committed.
 - Automated verification passes: 19 backend unit tests, the bundled iOS JavaScript behavior/syntax test, Python compilation, and diff validation.
-- The app source is still BiteLog 1.6.4 build 24. A new build number, iPhone installation, TestFlight upload, and enforcement activation have not been performed.
+- Live verification passed: `/health` returned OK, a reserved code returned a token for `tester-01` with a 432,000-second lifetime, and a no-token analysis request was not rejected by invite authorization. The app source is still BiteLog 1.6.4 build 24; a new build number, iPhone installation, TestFlight upload, and enforcement activation have not been performed.
 
 ## November 12, 2026 — grams-based photo portions saved locally
 

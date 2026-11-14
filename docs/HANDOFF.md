@@ -8,7 +8,9 @@
 - Added optional authorization enforcement to every paid analysis/upload route. The default and current Vercel production value remain `false`, so build 24 and Amie are not interrupted.
 - Added the invite-code screen before iPhone profile onboarding. The app sends codes only to the backend, stores only the returned token and expiry, and adds the Bearer token to photo, voice, journal, plan, object-analysis, and upload requests.
 - Added expiry handling that clears invalid access and reopens the invite screen with a clear message.
-- Added the four production Vercel settings. Code hashes and the token-signing key are non-revealable Secrets; TTL and enforcement are Config values. Vercel reports that a new deployment is required.
+- Added the four production Vercel settings. Code hashes and the token-signing key are non-revealable Secrets; TTL and enforcement are Config values.
+- Pushed commits `dcbbd2b` and `8a0f43a` to `origin/main`. Vercel deployed `8a0f43a` successfully to `https://bitelog-api.vercel.app`.
+- Verified live health, reserved-code redemption, the five-day expiry, and backward compatibility while enforcement is off. The no-token analysis request reached the normal route instead of returning an invite-authentication error.
 - Passed 19 backend unit tests, the iOS JavaScript behavior/syntax test, Python compilation, and `git diff --check`.
 - Current branch: `main`.
 
@@ -29,14 +31,13 @@
 ### Known issues
 
 - `INVITE_ENFORCEMENT_ENABLED` must remain `false` until the invite-enabled iPhone build is installed, tested, and distributed. Enabling it earlier would block the current TestFlight/App Store build from paid API routes.
-- The production deployment has not yet been refreshed with this code and the new environment values.
 - The app is still version 1.6.4 build 24; no new archive or TestFlight build has been created.
-- The first production deployment should test one reserved code and confirm existing no-token clients still work before any iPhone distribution work.
+- Physical-iPhone testing of the invite screen, photo grams flow, and Save behavior is still pending.
 - A database-backed tester dashboard, per-user scan counts, code revocation, and token-spend reporting remain future work. This release intentionally uses a small server-side reserved-code list.
 
 ### Next recommended task
 
-Push `main`, allow Vercel to deploy with enforcement off, verify `/health` and `/v1/invites/redeem`, then create the next iOS build and test invite code → profile → photo scan → optional grams → Save on Kanika’s iPhone. Only after the updated TestFlight build reaches testers should enforcement be changed to `true` and redeployed.
+Create the next iOS build and test invite code → profile → photo scan → optional grams → Save on Kanika’s iPhone. Only after the updated TestFlight build reaches testers should enforcement be changed to `true` and redeployed.
 
 ### Exact run commands
 
