@@ -20,11 +20,12 @@ from app.schemas import (
     PlanEstimate,
     PresignRequest,
     PresignResponse,
+    TextMealAnalysisRequest,
     VoiceMealAnalysisRequest,
     VoiceMealEstimate,
     VoiceTranscription,
 )
-from app.services.openai_meal_analyzer import MealAnalysisError, analyze_meal
+from app.services.openai_meal_analyzer import MealAnalysisError, analyze_meal, analyze_text_meal
 from app.services.openai_plan_analyzer import analyze_plan
 from app.services.openai_voice_meal_analyzer import analyze_voice_meal, transcribe_audio
 from app.services.invite_access import redeem_invite_code, require_invite_access
@@ -138,6 +139,18 @@ async def analyze_object(
     settings: Settings = Depends(get_settings),
 ):
     return await analyze_meal(str(body.image_url), settings)
+
+
+@app.post("/v1/meals/analyze-text", response_model=PhotoMealEstimate)
+async def analyze_text(
+    body: TextMealAnalysisRequest,
+    _invite_id: Optional[str] = Depends(require_invite_access),
+    settings: Settings = Depends(get_settings),
+):
+    """Estimate nutrition from a plain-language food description and portion."""
+    if body.grams is None and body.portion_fraction is None:
+        raise HTTPException(status_code=422, detail="Choose grams or an approximate portion first.")
+    return await analyze_text_meal(body.description, body.grams, body.portion_fraction, settings)
 
 
 @app.post("/v1/meals/analyze-voice", response_model=VoiceMealEstimate)

@@ -7,6 +7,12 @@ class InlineMealAnalysisRequest(BaseModel):
     image_data_url: str = Field(min_length=32)
 
 
+class TextMealAnalysisRequest(BaseModel):
+    description: str = Field(min_length=2, max_length=500)
+    grams: Optional[float] = Field(default=None, gt=0, le=10000)
+    portion_fraction: Optional[float] = Field(default=None, gt=0, le=1)
+
+
 class VoiceMealAnalysisRequest(BaseModel):
     audio_data_url: str = Field(min_length=32)
 

@@ -54,6 +54,23 @@ class PhotoAnalysisTests(unittest.TestCase):
         self.assertEqual(response.json(), ESTIMATE)
         self.assertEqual(len(response.headers['X-Request-ID']), 32)
 
+    def test_manual_description_and_portion_contract(self):
+        async def post(client, url, **kwargs):
+            body = kwargs['json']
+            self.assertEqual(url, 'https://api.openai.com/v1/responses')
+            prompt = body['input'][0]['content'][0]['text']
+            self.assertIn('Chobani drink', prompt)
+            self.assertIn('20 grams', prompt)
+            self.assertEqual(body['text']['format']['type'], 'json_schema')
+            return httpx.Response(200, json=self.output(dict(ESTIMATE, name='Chobani drink', estimated_weight_grams=20)))
+        with patch('app.services.openai_meal_analyzer.httpx.AsyncClient.post', post):
+            response = self.client.post('/v1/meals/analyze-text', json={
+                'description': 'Chobani drink', 'grams': 20})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()['estimated_weight_grams'], 20)
+        self.assertEqual(self.client.post('/v1/meals/analyze-text', json={
+            'description': 'Toast'}).status_code, 422)
+
     def test_invalid_images_never_call_provider(self):
         with patch('app.main.analyze_meal') as provider:
             for value in ['data:image/gif;base64,' + 'a'*40, 'data:image/png;base64,' + '!'*40]:

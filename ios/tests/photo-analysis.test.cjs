@@ -3,8 +3,12 @@ const html=fs.readFileSync(require('node:path').join(__dirname,'../BiteLog/Resou
 const declaredIds=new Set([...html.matchAll(/\bid="([^"]+)"/g)].map(match=>match[1]));
 const referencedIds=new Set([...html.matchAll(/\$\('#([^']+)'\)/g)].map(match=>match[1]));
 assert.deepEqual([...referencedIds].filter(id=>!declaredIds.has(id)).sort(),[], 'JavaScript references missing DOM elements');
-assert.match(html,/Math\.min\(1,1280\/Math\.max\(img\.width,img\.height\)\)/,'meal photos retain enough resolution for food analysis');
-assert.match(html,/toDataURL\('image\/jpeg',\.84\)/,'meal photos use the expected JPEG quality');
+assert.match(html,/Math\.min\(1,1024\/Math\.max\(img\.width,img\.height\)\)/,'meal photos are resized for faster upload');
+assert.match(html,/toDataURL\('image\/jpeg',\.78\)/,'meal photos use the faster JPEG quality');
+assert.match(html,/id="portionHalf"/,'meal portions include a one-half shortcut');
+assert.match(html,/id="portionQuarter"/,'meal portions include a one-quarter shortcut');
+assert.match(html,/\/v1\/meals\/analyze-text/,'manual meals are estimated server-side');
+assert.match(html,/class="wide plan-analyze" id="saveProgram" disabled/,'plan analysis starts as the secondary action');
 assert.match(html,/id="inviteDialog"/,'invite access is required before onboarding');
 assert.match(html,/\/v1\/invites\/redeem/,'invite codes are redeemed by the backend');
 assert.match(html,/headers:apiHeaders\(\)/,'protected API requests use shared authorization headers');
@@ -20,7 +24,7 @@ function $(id){return nodes[id] ||= {
 }}
 class FileReader{readAsDataURL(){this.result='data:audio/mp4;base64,dGVzdA==';this.onload()}}
 const testAccessToken='signed-invite-token-for-bitelog-tests';
-const context={$,URL,AbortController,TypeError,Blob,FileReader,console,setTimeout,clearTimeout,alert(){},today:()=> '2026-09-20',document:{querySelector(selector){if(selector==='meta[name=\"bitelog-api-base\"]')return{content:'http://192.168.1.2:8000'};return $(selector)}},window:{scrollTo(){order.push('scroll')}},photoData:'data:image/jpeg;base64,test',photoThumbnailData:'data:image/jpeg;base64,thumb',photoEstimate:null,photoVersion:0,analysisController:null,state:{apiBaseURL:'http://192.168.1.2:8000',inviteAccess:{token:testAccessToken,expiresAt:Date.now()+60000}},fetch:null};
+const context={$,URL,AbortController,TypeError,Blob,FileReader,console,setTimeout,clearTimeout,alert(){},today:()=> '2026-09-20',document:{querySelector(selector){if(selector==='meta[name=\"bitelog-api-base\"]')return{content:'http://192.168.1.2:8000'};return $(selector)}},window:{scrollTo(){order.push('scroll')}},photoData:'data:image/jpeg;base64,test',photoThumbnailData:'data:image/jpeg;base64,thumb',photoEstimate:null,photoVersion:0,analysisController:null,mealEntryMode:'photo',portionMode:'quick',portionFraction:1,state:{apiBaseURL:'http://192.168.1.2:8000',inviteAccess:{token:testAccessToken,expiresAt:Date.now()+60000}},fetch:null};
 vm.createContext(context);
 const script=html.match(/<script>([\s\S]*?)<\/script>/)[1];
 new vm.Script(script); // Syntax-check the complete app too.
@@ -40,12 +44,14 @@ const click=()=>$('#estimateMeal').handlers.click();
  assert.throws(()=>context.checkedAPIURL('https://user:secret@example.com'),/credentials/);
  context.fetch=async(url,options)=>{assert.equal(url,'http://192.168.1.2:8000/v1/meals/analyze-inline');assert.equal(options.headers.Authorization,'Bearer '+testAccessToken);assert.equal(JSON.parse(options.body).image_data_url,context.photoData);return response(estimate)};
  await click();assert.equal($('#name').value,'Eggs');assert.equal($('#carbs').value,34);assert.equal($('#protein').value,23.5);assert.equal($('#portionField').hidden,false);assert.match($('#portionHint').textContent,/500g/);assert.match($('#aiHint').textContent,/Two eggs/);assert.match($('#estimateValues').textContent,/34g carbs/);assert.match($('#estimateValues').textContent,/80%/);
- $('#portionGrams').value='250';$('#portionGrams').handlers.input();assert.equal($('#calories').value,200);assert.equal($('#carbs').value,17);assert.equal($('#protein').value,11.8);
+ context.setQuickPortion(.5);assert.equal($('#calories').value,200);assert.equal($('#carbs').value,17);assert.equal($('#protein').value,11.8);
+ context.setPortionMode('grams');$('#portionGrams').value='250';$('#portionGrams').handlers.input();assert.equal($('#calories').value,200);assert.equal($('#carbs').value,17);assert.equal($('#protein').value,11.8);
  context.fetch=async()=>response({});await click();assert.match($('#aiHint').textContent,/invalid meal estimate/);assert.equal($('#name').value,'Eggs');
  context.fetch=async()=>response({detail:'Photo analysis timed out.'},504);await click();assert.match($('#aiHint').textContent,/timed out/);assert.equal($('#saveMeal').disabled,false);
  context.fetch=async()=>{throw new TypeError('Failed to fetch')};await click();assert.match($('#aiHint').textContent,/Check Wi-Fi/);
  context.fetch=async()=>{const e=new Error();e.name='AbortError';throw e};await click();assert.match($('#aiHint').textContent,/timed out/);
  let resolve;context.fetch=()=>new Promise(r=>resolve=r);const pending=click();assert.equal($('#saveMeal').disabled,true);context.resetAnalysis();$('#name').value='New meal';resolve(response(estimate));await pending;assert.equal($('#name').value,'New meal');
+ context.mealEntryMode='manual';context.portionMode='grams';$('#name').value='Chobani drink';$('#portionGrams').value='20';context.fetch=async(url,options)=>{assert.equal(url,'http://192.168.1.2:8000/v1/meals/analyze-text');assert.deepEqual(JSON.parse(options.body),{description:'Chobani drink',grams:20});return response({...estimate,name:'Chobani drink',calories:18,carbs:2.4,protein:2})};await $('#estimateManual').handlers.click();assert.equal($('#calories').value,18);assert.equal($('#saveMeal').disabled,false);assert.equal($('#nutritionFields').hidden,false);
  const meals=[];context.day=()=>meals;context.persist=()=>order.push('persist');context.storedMealExists=()=>true;context.switchTab=tab=>order.push('tab:'+tab);context.render=()=>order.push('render');context.photoEstimate=estimate;
  $('#name').value='Eggs';$('#calories').value='200';$('#carbs').value='17';$('#protein').value='11.8';$('#portionGrams').value='250';$('#type').value='Breakfast';$('#time').value='08:15';$('#mealDialog').hidden=false;$('#mealDialog').classList.add('open');order.length=0;
  context.saveMeal();

@@ -1,5 +1,78 @@
 # BiteLog handoff — November 14, 2026
 
+## November 14, 2026 — build 26 uploaded for fresh TestFlight testing
+
+### Completed
+
+- Added two clear portion modes for meal logging: quick estimates (all, three quarters, half, or one quarter) and exact grams.
+- Added server-side nutrition estimation for manual food descriptions plus a selected portion. Athletes now enter what they ate and the portion; BiteLog estimates calories, carbohydrates, and protein before saving.
+- Reduced photo upload size to improve analysis speed while preserving the existing server-side vision analysis and structured nutrition response.
+- Refined the Plan flow so the chosen PDF or photo becomes subdued and **Analyze and Save Plan** becomes the clear green primary action.
+- Promoted the app to BiteLog 1.6.6 build 26, built and installed it on Kanika's iPhone, archived it, and uploaded it successfully to App Store Connect.
+- Deployed the updated backend to `https://bitelog-api.vercel.app`; invite enforcement remains active.
+- Passed 20 backend tests, the iOS behavior/syntax suite, Python compilation, plist validation, and diff validation.
+- Left the existing public App Store submission untouched, as requested.
+- Current branch: `main`.
+
+### Files changed
+
+- `backend/app/main.py`
+- `backend/app/schemas.py`
+- `backend/app/services/openai_meal_analyzer.py`
+- `backend/tests/test_photo_analysis.py`
+- `ios/BiteLog/Info.plist`
+- `ios/BiteLog/Resources/index.html`
+- `ios/BiteLogHealth.xcodeproj/project.pbxproj`
+- `ios/tests/photo-analysis.test.cjs`
+- `docs/CURRENT_STATE.md`
+- `docs/HANDOFF.md`
+
+### Known issues
+
+- Build 26 is assigned to the new external group `Amie build 26 testing` and is `Waiting for Review` in Beta App Review.
+- Amie Cox (`amiestargetnutrition@gmail.com`) is the sole tester in the new group. She can install build 26 after Apple approves the external beta.
+- The old external group `Amie testing` and its public link were removed. Amie's tester account was preserved through the new group; the two anonymous public-link testers were not moved.
+- Portion and manual-estimate interactions passed automated tests, but Kanika's final physical-iPhone tap-through remains recommended after TestFlight availability.
+
+### Next recommended task
+
+Monitor Beta App Review for build 26. When Apple approves it, confirm Amie can update in TestFlight and complete the manual journey: create a starter plan, upload it, log meals, and email the weekly update. Do not change the in-flight public App Store submission.
+
+### Exact run commands
+
+```bash
+cd /Users/kanika/Documents/Healthapp/BiteLog-v1.2-production/backend
+/Users/kanika/Documents/Healthapp/BiteLogproduction/backend/.venv/bin/python -m unittest discover -s tests -v
+
+cd /Users/kanika/Documents/Healthapp/BiteLog-v1.2-production
+node ios/tests/photo-analysis.test.cjs
+PYTHONPYCACHEPREFIX=/private/tmp/bitelog-pycache python3 -m compileall -q backend/app backend/tests
+plutil -lint ios/BiteLog/Info.plist
+git diff --check
+```
+
+Run the backend locally if needed:
+
+```bash
+cd /Users/kanika/Documents/Healthapp/BiteLog-v1.2-production/backend
+source /Users/kanika/Documents/Healthapp/BiteLogproduction/backend/.venv/bin/activate
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+```
+
+### Exact manual test steps
+
+1. Open Add meal and analyze a clear food photo.
+2. Choose **Easy estimate**, select half or one quarter, and confirm calories, carbohydrates, and protein scale immediately.
+3. Switch to **Exact grams**, enter a gram amount, and confirm the nutrition values scale.
+4. Save the meal and confirm the sheet closes, exactly one meal appears, and the selected portion is shown.
+5. Open manual logging, enter only the food description, select a portion, and tap **Calculate nutrition**. Confirm BiteLog fills calories, carbohydrates, and protein before Save becomes available.
+6. Choose a plan PDF or photo. Confirm the chooser becomes subdued, **Analyze and Save Plan** turns green, and the extracted plan is saved.
+7. Force-close and reopen BiteLog, then confirm saved meals and the plan remain available.
+
+### Proposed commit message
+
+`Improve meal portions and manual nutrition estimates`
+
 ## November 14, 2026 — build 25 installed and production made invite-only
 
 ### Completed

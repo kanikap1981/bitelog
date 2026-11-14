@@ -1,5 +1,17 @@
 # Current state / handoff
 
+## November 14, 2026 — build 26 submitted for external TestFlight review
+
+- BiteLog is now version 1.6.6 build 26. The signed build was installed on Kanika's iPhone, archived successfully, and uploaded to App Store Connect at 1:39 PM Pacific time.
+- Build 26 completed processing and is `Waiting for Review` in external Beta App Review. The existing public App Store submission remains unchanged.
+- Photo and manual logging now support quick portion estimates (all, three quarters, half, or one quarter) and exact grams. Manual logging estimates calories, carbohydrates, and protein server-side from the food description and chosen portion before Save is enabled.
+- Photo uploads are resized to 1024px at JPEG quality 0.78 to reduce transfer and analysis latency.
+- The Plan upload screen now promotes **Analyze and Save Plan** as the primary green action after a document is selected, while the selected-file control becomes subdued.
+- The updated backend is live at `https://bitelog-api.vercel.app`, with invite-only enforcement active. The new manual-estimate route is protected by the same invite token as the other AI routes.
+- Verification passes: 20 backend tests, the bundled iOS behavior/syntax test, Python compilation, plist validation, and diff validation.
+- The replacement external group is `Amie build 26 testing`. It contains build 26 and Amie Cox (`amiestargetnutrition@gmail.com`). Its tester instructions begin at `https://b8log.com/starter-plan` and cover plan generation, PDF upload, meal tracking, and the weekly email update.
+- The old `Amie testing` group and its public link were removed after the replacement was verified. Amie's tester record remains active in the new group; the two anonymous public-link testers were intentionally not moved.
+
 ## November 14, 2026 — invite-only build 25 ready for manual iPhone testing
 
 - BiteLog is now version 1.6.5 build 25. The signed Debug build was installed successfully on Kanika's connected iPhone 17 Pro.

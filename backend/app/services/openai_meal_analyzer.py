@@ -2,7 +2,7 @@ import asyncio
 import json
 import logging
 import time
-from typing import Any
+from typing import Any, Optional
 
 import httpx
 
@@ -124,3 +124,56 @@ async def analyze_meal(image_url: str, settings: Settings) -> PhotoMealEstimate:
         return PhotoMealEstimate.model_validate(json.loads(text))
     except (ValueError, TypeError, AttributeError) as exc:
         raise MealAnalysisError("Photo analysis returned an invalid estimate. Please try again.") from exc
+
+
+async def analyze_text_meal(
+    description: str,
+    grams: Optional[float],
+    portion_fraction: Optional[float],
+    settings: Settings,
+) -> PhotoMealEstimate:
+    if not settings.openai_api_key.strip() or settings.openai_api_key == "replace_me":
+        raise MealAnalysisError("Meal estimation is not configured on the server.", 503)
+
+    if grams is not None:
+        portion = f"The athlete ate {grams:g} grams. Estimate nutrition for exactly that amount."
+    else:
+        portion = f"The athlete ate {round(float(portion_fraction or 1) * 100):d}% of a typical serving."
+    request_body = {
+        "model": settings.openai_model,
+        "store": False,
+        "instructions": (
+            "You estimate nutrition for an athlete's manual food log. Use the food description and stated portion. "
+            "Return the likely meal name, calories, carbohydrate, protein, estimated consumed weight in grams, confidence, "
+            "a short description, and concise assumptions. Be conservative and transparent rather than falsely precise. "
+            "Do not provide medical advice."
+        ),
+        "input": [{
+            "role": "user",
+            "content": [{"type": "input_text", "text": f"Food: {description.strip()}\nPortion: {portion}"}],
+        }],
+        "text": {"format": {"type": "json_schema", "name": "meal_estimate", "strict": True, "schema": MEAL_SCHEMA}},
+    }
+    headers = {"Authorization": f"Bearer {settings.openai_api_key}", "Content-Type": "application/json"}
+    try:
+        async with httpx.AsyncClient(timeout=httpx.Timeout(30.0, connect=10.0)) as client:
+            response = await asyncio.wait_for(
+                client.post("https://api.openai.com/v1/responses", headers=headers, json=request_body),
+                timeout=35.0,
+            )
+    except (httpx.TimeoutException, asyncio.TimeoutError) as exc:
+        raise MealAnalysisError("Meal estimation timed out. Please try again.", 504) from exc
+    except httpx.RequestError as exc:
+        raise MealAnalysisError("The server could not reach meal estimation. Please try again.", 503) from exc
+
+    if response.status_code >= 400:
+        logger.warning("text_meal_provider status=%s", response.status_code)
+        if response.status_code in (401, 403):
+            raise MealAnalysisError("Meal estimation credentials were rejected.", 503)
+        if response.status_code == 429:
+            raise MealAnalysisError("Meal estimation is temporarily unavailable. Please try later.", 503)
+        raise MealAnalysisError("Meal estimation failed. Please try again.")
+    try:
+        return PhotoMealEstimate.model_validate(json.loads(_find_output_text(response.json())))
+    except (ValueError, TypeError, AttributeError) as exc:
+        raise MealAnalysisError("Meal estimation returned an invalid result. Please try again.") from exc
