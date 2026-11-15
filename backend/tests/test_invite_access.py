@@ -52,6 +52,17 @@ class InviteAccessTests(unittest.TestCase):
         self.settings.invite_token_secret = "too-short"
         self.assertEqual(self.redeem().status_code, 503)
 
+    def test_revokes_code_and_previously_issued_tokens(self):
+        token = self.redeem().json()["access_token"]
+
+        self.settings.invite_revoked_code_hashes = VALID_DIGEST
+        self.assertEqual(self.redeem().status_code, 401)
+
+        self.settings.invite_revoked_ids = "tester-01"
+        with self.assertRaises(Exception) as revoked:
+            verify_invite_token(token, self.settings)
+        self.assertEqual(revoked.exception.status_code, 401)
+
     def test_enforcement_is_off_by_default_and_can_be_enabled(self):
         estimate = PhotoMealEstimate(**ESTIMATE)
         with patch("app.main.analyze_meal", new=AsyncMock(return_value=estimate)) as provider:

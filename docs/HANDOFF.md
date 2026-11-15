@@ -1,4 +1,57 @@
-# BiteLog handoff — November 14, 2026
+# BiteLog handoff — November 15, 2026
+
+## November 15, 2026 — shared tester code revoked
+
+### Completed
+
+- Added server-side revocation lists for invite-code hashes and invite IDs.
+- Revoked the previously shared tester code without committing its plaintext value. New redemption now returns HTTP 401, and previously issued tokens for `tester-05` are rejected.
+- Stored the revocation hash and tester ID as protected Vercel production secrets and deployed the backend successfully to `https://bitelog-api.vercel.app`.
+- Verified production health returns HTTP 200 and the revoked code returns HTTP 401 with a clear invalid-code response.
+- Regenerated the tester instruction video so it says to use the personal invite code from the tester's email and no longer displays the shared code.
+- Current branch: `main`.
+
+### Files changed
+
+- `backend/.env.example`
+- `backend/README.md`
+- `backend/app/config.py`
+- `backend/app/services/invite_access.py`
+- `backend/tests/test_invite_access.py`
+- `docs/CURRENT_STATE.md`
+- `docs/HANDOFF.md`
+
+### Known issues
+
+- Reserved codes remain reusable until individually revoked because there is still no invite database.
+- The revised instruction video is a local deliverable outside this repository at `/Users/kanika/Documents/ChatGPT/Agentic Engineering/BiteLog-starter-plan-instructions.mp4`.
+- Build 26 remains subject to Apple external Beta App Review.
+
+### Next recommended task
+
+Send each tester only their individual invite code. Do not reuse a code in public posts, group emails, screenshots, or videos. Later, add database-backed one-time redemption and tester usage reporting.
+
+### Exact run commands
+
+```bash
+cd /Users/kanika/Documents/Healthapp/BiteLog-v1.2-production/backend
+/Users/kanika/Documents/Healthapp/BiteLogproduction/backend/.venv/bin/python -m unittest discover -s tests -v
+PYTHONPYCACHEPREFIX=/private/tmp/bitelog-pycache python3 -m compileall -q app tests
+
+cd /Users/kanika/Documents/Healthapp/BiteLog-v1.2-production
+git diff --check
+```
+
+### Exact test steps
+
+1. Call `GET https://bitelog-api.vercel.app/health` and confirm HTTP 200.
+2. Attempt to redeem the revoked shared code and confirm HTTP 401.
+3. Redeem an unrevoked individual tester code and confirm it receives a five-day token.
+4. Use that token for a protected analysis route and confirm the request is accepted.
+
+### Proposed commit message
+
+`Add invite code revocation`
 
 ## November 14, 2026 — build 26 tester rollout prepared
 

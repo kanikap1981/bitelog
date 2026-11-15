@@ -19,7 +19,7 @@ The production API is deployed at `https://bitelog-api.vercel.app`. BiteLog 1.6.
 
 The Vercel project root is this `backend` directory. `app/main.py` is the FastAPI entrypoint and `vercel.json` configures the function duration. Production requires `OPENAI_API_KEY`, `OPENAI_MODEL`, `APP_ENV`, and `MAX_INLINE_IMAGE_BYTES` in Vercel's protected environment settings.
 
-Invite-only rollout also uses `INVITE_CODE_HASHES`, `INVITE_TOKEN_SECRET`, `INVITE_TOKEN_TTL_SECONDS`, and `INVITE_ENFORCEMENT_ENABLED`. Keep enforcement `false` until the invite-enabled mobile build is distributed. Never commit plaintext invite codes or the token secret.
+Invite-only rollout also uses `INVITE_CODE_HASHES`, `INVITE_REVOKED_CODE_HASHES`, `INVITE_REVOKED_IDS`, `INVITE_TOKEN_SECRET`, `INVITE_TOKEN_TTL_SECONDS`, and `INVITE_ENFORCEMENT_ENABLED`. Revoked code hashes prevent new redemption, while revoked invite IDs invalidate already-issued tokens. Keep enforcement `false` until the invite-enabled mobile build is distributed. Never commit plaintext invite codes or the token secret.
 
 ```bash
 cd backend

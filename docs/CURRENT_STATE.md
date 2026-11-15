@@ -1,5 +1,13 @@
 # Current state / handoff
 
+## November 15, 2026 — shared tester invite revoked
+
+- Production now supports protected revocation lists for invite-code hashes and invite IDs. This blocks new redemption and invalidates existing signed access for a revoked tester without changing other reserved codes.
+- The previously shared code is revoked in production as `tester-05`. Its plaintext value is not committed.
+- Live verification passed: `/health` returned HTTP 200 and the revoked code returned HTTP 401.
+- The tester instruction video was regenerated outside the repository to direct each tester to use the personal invite code from their email.
+- Invite codes are still reusable unless revoked; true one-time codes and tester analytics still require persistent storage.
+
 ## November 14, 2026 — build 26 submitted for external TestFlight review
 
 - BiteLog is now version 1.6.6 build 26. The signed build was installed on Kanika's iPhone, archived successfully, and uploaded to App Store Connect at 1:39 PM Pacific time.

@@ -37,6 +37,10 @@ def _configured_invites(settings: Settings) -> list[tuple[str, str]]:
     return entries
 
 
+def _configured_values(raw_values: str) -> set[str]:
+    return {value.strip().lower() for value in raw_values.split(",") if value.strip()}
+
+
 def _b64encode(value: bytes) -> str:
     return base64.urlsafe_b64encode(value).decode("ascii").rstrip("=")
 
@@ -58,6 +62,9 @@ def redeem_invite_code(code: str, settings: Settings, now: Optional[int] = None)
         raise HTTPException(status_code=503, detail="Invite access is not configured.")
 
     candidate = invite_code_digest(code)
+    if candidate in _configured_values(settings.invite_revoked_code_hashes):
+        raise HTTPException(status_code=401, detail="That invite code is not valid.")
+
     invite_id = ""
     for configured_id, configured_digest in configured:
         if hmac.compare_digest(candidate, configured_digest):
@@ -99,7 +106,8 @@ def verify_invite_token(token: str, settings: Settings, now: Optional[int] = Non
         raise HTTPException(status_code=401, detail="Invite access has expired or is invalid.")
 
     current_time = int(time.time()) if now is None else int(now)
-    if version != 1 or not invite_id or expires_at <= current_time:
+    revoked_ids = _configured_values(settings.invite_revoked_ids)
+    if version != 1 or not invite_id or invite_id.lower() in revoked_ids or expires_at <= current_time:
         raise HTTPException(status_code=401, detail="Invite access has expired or is invalid.")
     return invite_id
 

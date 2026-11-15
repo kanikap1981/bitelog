@@ -17,6 +17,8 @@ class Settings(BaseSettings):
     database_url: str = "postgresql://bitelog:bitelog@localhost:5432/bitelog"
     redis_url: str = "redis://localhost:6379/0"
     invite_code_hashes: str = ""
+    invite_revoked_code_hashes: str = ""
+    invite_revoked_ids: str = ""
     invite_token_secret: str = ""
     invite_token_ttl_seconds: int = 432000
     invite_enforcement_enabled: bool = False
